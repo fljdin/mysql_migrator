@@ -70,7 +70,7 @@ DECLARE
       CREATE OR REPLACE VIEW %1$I.foreign_keys AS
          SELECT "CONSTRAINT_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
             "CONSTRAINT_NAME" AS constraint_name, false AS "deferrable", false AS deferred,
-            "DELETE_RULE" AS delete_rule, "ORDINAL_POSITION" AS position, 
+            "DELETE_RULE" AS delete_rule, "COLUMN_NAME" AS column_name, "ORDINAL_POSITION" AS position, 
             "REFERENCED_TABLE_SCHEMA" AS remote_schema, keys."REFERENCED_TABLE_NAME" AS remote_table,
             "REFERENCED_COLUMN_NAME" AS remote_column
          FROM %1$I."KEY_COLUMN_USAGE" keys
@@ -84,7 +84,10 @@ DECLARE
    keys_sql text := $$
       CREATE OR REPLACE VIEW %1$I.keys AS
          SELECT "CONSTRAINT_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
-            "CONSTRAINT_NAME" AS constraint_name, false AS "deferrable", false AS deferred,
+            (CASE WHEN "CONSTRAINT_NAME" = 'PRIMARY'
+               THEN concat_ws('_', "TABLE_NAME", "COLUMN_NAME", 'pkey')
+               ELSE "CONSTRAINT_NAME"
+            END)::character varying(64) AS constraint_name, false AS "deferrable", false AS deferred,
             "COLUMN_NAME" AS column_name, "ORDINAL_POSITION" AS position, 
             ("CONSTRAINT_TYPE" = 'PRIMARY KEY') AS is_primary
          FROM %1$I."TABLE_CONSTRAINTS" cons
@@ -165,9 +168,16 @@ DECLARE
    /* index_columns */
    index_columns_sql text := $$
       CREATE OR REPLACE VIEW %1$I.index_columns AS
-         SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name, "INDEX_NAME" AS index_name,
-         "SEQ_IN_INDEX" AS position, (CASE WHEN "COLLATION" = 'D' THEN true ELSE false END) AS descend,
-         "COLUMN_NAME" AS col_name, "EXPRESSION" AS col_expression
+         SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name, 
+            concat_ws('_', "TABLE_NAME", "INDEX_NAME")::character varying(64) AS index_name, 
+            "SEQ_IN_INDEX" AS position, (CASE WHEN "COLLATION" = 'D' THEN true ELSE false END) AS descend,
+            "EXPRESSION" IS NOT NULL 
+               AND ("COLLATION" <> 'D' OR "EXPRESSION" !~ '^`[^`]*`$') AS is_expression,
+            coalesce(
+               CASE WHEN "COLLATION" = 'D' AND "EXPRESSION" !~ '^`[^`]*`$'
+                  THEN replace ("EXPRESSION", '`', '''')
+                  ELSE "EXPRESSION"
+               END, "COLUMN_NAME")::character varying(64) AS column_name
          FROM %1$I."STATISTICS"
          WHERE "TABLE_SCHEMA" NOT IN (%2$s)
          AND "INDEX_NAME" <> 'PRIMARY' AND "IS_VISIBLE"::boolean; -- prior to MySQL v8
@@ -178,8 +188,8 @@ DECLARE
    indexes_sql text := $$
       CREATE OR REPLACE VIEW %1$I.indexes AS
          SELECT DISTINCT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
-            "INDEX_NAME" AS index_name, "INDEX_TYPE" AS index_type, 
-            ("NON_UNIQUE" = 0) AS uniqueness
+            concat_ws('_', "TABLE_NAME", "INDEX_NAME")::character varying(64) AS index_name, 
+            "INDEX_TYPE" AS index_type, ("NON_UNIQUE" = 0) AS uniqueness
          FROM %1$I."STATISTICS"
          WHERE "TABLE_SCHEMA" NOT IN (%2$s)
          AND "INDEX_NAME" <> 'PRIMARY' AND "IS_VISIBLE"::boolean; -- prior to MySQL v8
@@ -224,7 +234,7 @@ DECLARE
    table_privs_sql text := $$
       CREATE OR REPLACE VIEW %1$I.table_privs AS
          SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name, 
-            "PRIVILEGE_TYPE" AS privilege, null::varchar(292) AS grantor,
+            "PRIVILEGE_TYPE" AS privilege, 'root'::varchar(292) AS grantor,
             "GRANTEE" as grantee, "IS_GRANTABLE"::boolean AS grantable
          FROM %1$I."TABLE_PRIVILEGES"
          WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" !~ 'root';
@@ -236,7 +246,7 @@ DECLARE
       CREATE OR REPLACE VIEW %1$I.column_privs AS
          SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
             "COLUMN_NAME" AS column_name, "PRIVILEGE_TYPE" AS privilege,
-            null::varchar(292) AS grantor, "GRANTEE" AS grantee, "IS_GRANTABLE"::boolean AS grantable
+            'root'::varchar(292) AS grantor, "GRANTEE" AS grantee, "IS_GRANTABLE"::boolean AS grantable
          FROM %1$I."COLUMN_PRIVILEGES"
          WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" !~ 'root';
       COMMENT ON VIEW %1$I.column_privs IS 'Privileges on MySQL table columns on foreign server "%3$I"';
@@ -423,7 +433,7 @@ BEGIN
 
    RETURN stmt || format(
                      E') SERVER %I\n'
-                     '   OPTIONS (dbname ''%s'', table_name ''%s'', readonly ''true'', max_blob_size ''%s'')',
+                     '   OPTIONS (dbname ''%s'', table_name ''%s'', max_blob_size ''%s'')',
                      server, orig_schema, orig_table,
                      CASE WHEN options ? 'max_blob_size'
                           THEN (options->>'max_blob_size')::bigint
