@@ -1,0 +1,1 @@
+SELECT CONCAT("ALTER DEFINER=`root` VIEW ", table_name," AS ", view_definition,";") FROM information_schema.views WHERE table_schema='sakila';

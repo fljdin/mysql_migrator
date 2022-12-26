@@ -1,0 +1,40 @@
+/*
+ * Test migration from MySQL.
+ *
+ * This requires that a sakiladb container is running
+ * docker run -p 3306:3306 --name sakiladb -d sakiladb/mysql:latest
+ *
+ * - views' definer must be 'root@%' instead of 'root@localhost'
+ */
+
+SET client_min_messages = WARNING;
+
+/* create a user to perform the migration */
+DROP ROLE IF EXISTS migrator;
+CREATE ROLE migrator LOGIN;
+
+/* create all requisite extensions */
+CREATE EXTENSION mysql_fdw;
+CREATE EXTENSION mysql_migrator CASCADE;
+
+/* create a foreign server and a user mapping */
+CREATE SERVER mysql FOREIGN DATA WRAPPER mysql_fdw
+   OPTIONS (fetch_size '1000');
+
+CREATE USER MAPPING FOR PUBLIC SERVER mysql
+   OPTIONS (username 'root', password 'p_ssW0rd');
+
+/* give the user the required permissions */
+GRANT CREATE ON DATABASE contrib_regression TO migrator;
+GRANT USAGE ON FOREIGN SERVER mysql TO migrator;
+
+/* connect as migration user */
+\connect - migrator
+SET client_min_messages = WARNING;
+
+/* set up staging schemas */
+CREATE SCHEMA IF NOT EXISTS fdw_stage;
+SELECT mysql_create_catalog(
+    server => 'mysql',
+    schema => 'fdw_stage'
+);

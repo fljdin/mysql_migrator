@@ -1,0 +1,1040 @@
+SET client_min_messages = WARNING;
+\dn
+        List of schemas
+   Name    |       Owner       
+-----------+-------------------
+ fdw_stage | migrator
+ public    | pg_database_owner
+(2 rows)
+
+\d fdw_stage.*
+                        Foreign table "fdw_stage.CHECK_CONSTRAINTS"
+       Column       |         Type          | Collation | Nullable | Default | FDW options 
+--------------------+-----------------------+-----------+----------+---------+-------------
+ CONSTRAINT_CATALOG | character varying(64) |           | not null |         | 
+ CONSTRAINT_SCHEMA  | character varying(64) |           | not null |         | 
+ CONSTRAINT_NAME    | character varying(64) |           | not null |         | 
+ CHECK_CLAUSE       | text                  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'CHECK_CONSTRAINTS')
+
+                                Foreign table "fdw_stage.COLUMNS"
+          Column          |          Type          | Collation | Nullable | Default | FDW options 
+--------------------------+------------------------+-----------+----------+---------+-------------
+ TABLE_CATALOG            | character varying(64)  |           | not null |         | 
+ TABLE_SCHEMA             | character varying(64)  |           | not null |         | 
+ TABLE_NAME               | character varying(64)  |           | not null |         | 
+ COLUMN_NAME              | character varying(64)  |           |          |         | 
+ ORDINAL_POSITION         | integer                |           | not null |         | 
+ COLUMN_DEFAULT           | text                   |           |          |         | 
+ IS_NULLABLE              | character varying(3)   |           | not null |         | 
+ DATA_TYPE                | text                   |           |          |         | 
+ CHARACTER_MAXIMUM_LENGTH | bigint                 |           |          |         | 
+ CHARACTER_OCTET_LENGTH   | bigint                 |           |          |         | 
+ NUMERIC_PRECISION        | bigint                 |           |          |         | 
+ NUMERIC_SCALE            | bigint                 |           |          |         | 
+ DATETIME_PRECISION       | integer                |           |          |         | 
+ CHARACTER_SET_NAME       | character varying(64)  |           |          |         | 
+ COLLATION_NAME           | character varying(64)  |           |          |         | 
+ COLUMN_TYPE              | text                   |           | not null |         | 
+ COLUMN_KEY               | text                   |           | not null |         | 
+ EXTRA                    | character varying(256) |           |          |         | 
+ PRIVILEGES               | character varying(154) |           |          |         | 
+ COLUMN_COMMENT           | text                   |           | not null |         | 
+ GENERATION_EXPRESSION    | text                   |           | not null |         | 
+ SRS_ID                   | integer                |           |          |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'COLUMNS')
+
+                      Foreign table "fdw_stage.COLUMN_PRIVILEGES"
+     Column     |          Type          | Collation | Nullable | Default | FDW options 
+----------------+------------------------+-----------+----------+---------+-------------
+ GRANTEE        | character varying(292) |           | not null |         | 
+ TABLE_CATALOG  | character varying(512) |           | not null |         | 
+ TABLE_SCHEMA   | character varying(64)  |           | not null |         | 
+ TABLE_NAME     | character varying(64)  |           | not null |         | 
+ COLUMN_NAME    | character varying(64)  |           | not null |         | 
+ PRIVILEGE_TYPE | character varying(64)  |           | not null |         | 
+ IS_GRANTABLE   | character varying(3)   |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'COLUMN_PRIVILEGES')
+
+                              Foreign table "fdw_stage.KEY_COLUMN_USAGE"
+            Column             |         Type          | Collation | Nullable | Default | FDW options 
+-------------------------------+-----------------------+-----------+----------+---------+-------------
+ CONSTRAINT_CATALOG            | character varying(64) |           | not null |         | 
+ CONSTRAINT_SCHEMA             | character varying(64) |           | not null |         | 
+ CONSTRAINT_NAME               | character varying(64) |           |          |         | 
+ TABLE_CATALOG                 | character varying(64) |           | not null |         | 
+ TABLE_SCHEMA                  | character varying(64) |           | not null |         | 
+ TABLE_NAME                    | character varying(64) |           | not null |         | 
+ COLUMN_NAME                   | character varying(64) |           |          |         | 
+ ORDINAL_POSITION              | integer               |           | not null |         | 
+ POSITION_IN_UNIQUE_CONSTRAINT | integer               |           |          |         | 
+ REFERENCED_TABLE_SCHEMA       | character varying(64) |           |          |         | 
+ REFERENCED_TABLE_NAME         | character varying(64) |           |          |         | 
+ REFERENCED_COLUMN_NAME        | character varying(64) |           |          |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'KEY_COLUMN_USAGE')
+
+                              Foreign table "fdw_stage.PARAMETERS"
+          Column          |         Type          | Collation | Nullable | Default | FDW options 
+--------------------------+-----------------------+-----------+----------+---------+-------------
+ SPECIFIC_CATALOG         | character varying(64) |           | not null |         | 
+ SPECIFIC_SCHEMA          | character varying(64) |           | not null |         | 
+ SPECIFIC_NAME            | character varying(64) |           | not null |         | 
+ ORDINAL_POSITION         | bigint                |           | not null |         | 
+ PARAMETER_MODE           | character varying(5)  |           |          |         | 
+ PARAMETER_NAME           | character varying(64) |           |          |         | 
+ DATA_TYPE                | text                  |           |          |         | 
+ CHARACTER_MAXIMUM_LENGTH | bigint                |           |          |         | 
+ CHARACTER_OCTET_LENGTH   | bigint                |           |          |         | 
+ NUMERIC_PRECISION        | integer               |           |          |         | 
+ NUMERIC_SCALE            | bigint                |           |          |         | 
+ DATETIME_PRECISION       | integer               |           |          |         | 
+ CHARACTER_SET_NAME       | character varying(64) |           |          |         | 
+ COLLATION_NAME           | character varying(64) |           |          |         | 
+ DTD_IDENTIFIER           | text                  |           | not null |         | 
+ ROUTINE_TYPE             | text                  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'PARAMETERS')
+
+                        Foreign table "fdw_stage.REFERENTIAL_CONSTRAINTS"
+          Column           |         Type          | Collation | Nullable | Default | FDW options 
+---------------------------+-----------------------+-----------+----------+---------+-------------
+ CONSTRAINT_CATALOG        | character varying(64) |           | not null |         | 
+ CONSTRAINT_SCHEMA         | character varying(64) |           | not null |         | 
+ CONSTRAINT_NAME           | character varying(64) |           |          |         | 
+ UNIQUE_CONSTRAINT_CATALOG | character varying(64) |           | not null |         | 
+ UNIQUE_CONSTRAINT_SCHEMA  | character varying(64) |           | not null |         | 
+ UNIQUE_CONSTRAINT_NAME    | character varying(64) |           |          |         | 
+ MATCH_OPTION              | text                  |           | not null |         | 
+ UPDATE_RULE               | text                  |           | not null |         | 
+ DELETE_RULE               | text                  |           | not null |         | 
+ TABLE_NAME                | character varying(64) |           | not null |         | 
+ REFERENCED_TABLE_NAME     | character varying(64) |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'REFERENTIAL_CONSTRAINTS')
+
+                            Foreign table "fdw_stage.ROUTINES"
+       Column       |         Type          | Collation | Nullable | Default | FDW options 
+--------------------+-----------------------+-----------+----------+---------+-------------
+ ROUTINE_SCHEMA     | character varying(64) |           | not null |         | 
+ ROUTINE_NAME       | character varying(64) |           | not null |         | 
+ ROUTINE_TYPE       | character varying(10) |           | not null |         | 
+ DTD_IDENTIFIER     | text                  |           |          |         | 
+ ROUTINE_BODY       | character varying(3)  |           | not null |         | 
+ ROUTINE_DEFINITION | text                  |           |          |         | 
+ EXTERNAL_LANGUAGE  | character varying(64) |           | not null |         | 
+ IS_DETERMINISTIC   | character varying(3)  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'ROUTINES')
+
+                                Foreign table "fdw_stage.SCHEMATA"
+           Column           |         Type          | Collation | Nullable | Default | FDW options 
+----------------------------+-----------------------+-----------+----------+---------+-------------
+ CATALOG_NAME               | character varying(64) |           | not null |         | 
+ SCHEMA_NAME                | character varying(64) |           | not null |         | 
+ DEFAULT_CHARACTER_SET_NAME | character varying(64) |           | not null |         | 
+ DEFAULT_COLLATION_NAME     | character varying(64) |           | not null |         | 
+ SQL_PATH                   | bytea                 |           |          |         | 
+ DEFAULT_ENCRYPTION         | text                  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'SCHEMATA')
+
+                          Foreign table "fdw_stage.STATISTICS"
+    Column     |          Type           | Collation | Nullable | Default | FDW options 
+---------------+-------------------------+-----------+----------+---------+-------------
+ TABLE_CATALOG | character varying(64)   |           | not null |         | 
+ TABLE_SCHEMA  | character varying(64)   |           | not null |         | 
+ TABLE_NAME    | character varying(64)   |           | not null |         | 
+ NON_UNIQUE    | integer                 |           | not null |         | 
+ INDEX_SCHEMA  | character varying(64)   |           | not null |         | 
+ INDEX_NAME    | character varying(64)   |           |          |         | 
+ SEQ_IN_INDEX  | integer                 |           | not null |         | 
+ COLUMN_NAME   | character varying(64)   |           |          |         | 
+ COLLATION     | character varying(1)    |           |          |         | 
+ CARDINALITY   | bigint                  |           |          |         | 
+ SUB_PART      | bigint                  |           |          |         | 
+ PACKED        | bytea                   |           |          |         | 
+ NULLABLE      | character varying(3)    |           | not null |         | 
+ INDEX_TYPE    | character varying(11)   |           | not null |         | 
+ COMMENT       | character varying(8)    |           | not null |         | 
+ INDEX_COMMENT | character varying(2048) |           | not null |         | 
+ IS_VISIBLE    | character varying(3)    |           | not null |         | 
+ EXPRESSION    | text                    |           |          |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'STATISTICS')
+
+                               Foreign table "fdw_stage.TABLES"
+     Column      |            Type             | Collation | Nullable | Default | FDW options 
+-----------------+-----------------------------+-----------+----------+---------+-------------
+ TABLE_CATALOG   | character varying(64)       |           | not null |         | 
+ TABLE_SCHEMA    | character varying(64)       |           | not null |         | 
+ TABLE_NAME      | character varying(64)       |           | not null |         | 
+ TABLE_TYPE      | text                        |           | not null |         | 
+ ENGINE          | character varying(64)       |           |          |         | 
+ VERSION         | integer                     |           |          |         | 
+ ROW_FORMAT      | text                        |           |          |         | 
+ TABLE_ROWS      | bigint                      |           |          |         | 
+ AVG_ROW_LENGTH  | bigint                      |           |          |         | 
+ DATA_LENGTH     | bigint                      |           |          |         | 
+ MAX_DATA_LENGTH | bigint                      |           |          |         | 
+ INDEX_LENGTH    | bigint                      |           |          |         | 
+ DATA_FREE       | bigint                      |           |          |         | 
+ AUTO_INCREMENT  | bigint                      |           |          |         | 
+ CREATE_TIME     | timestamp without time zone |           | not null |         | 
+ UPDATE_TIME     | timestamp without time zone |           |          |         | 
+ CHECK_TIME      | timestamp without time zone |           |          |         | 
+ TABLE_COLLATION | character varying(64)       |           |          |         | 
+ CHECKSUM        | bigint                      |           |          |         | 
+ CREATE_OPTIONS  | character varying(256)      |           |          |         | 
+ TABLE_COMMENT   | text                        |           |          |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'TABLES')
+
+                        Foreign table "fdw_stage.TABLE_CONSTRAINTS"
+       Column       |         Type          | Collation | Nullable | Default | FDW options 
+--------------------+-----------------------+-----------+----------+---------+-------------
+ CONSTRAINT_CATALOG | character varying(64) |           | not null |         | 
+ CONSTRAINT_SCHEMA  | character varying(64) |           | not null |         | 
+ CONSTRAINT_NAME    | character varying(64) |           |          |         | 
+ TABLE_SCHEMA       | character varying(64) |           | not null |         | 
+ TABLE_NAME         | character varying(64) |           | not null |         | 
+ CONSTRAINT_TYPE    | character varying(11) |           | not null |         | 
+ ENFORCED           | character varying(3)  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'TABLE_CONSTRAINTS')
+
+                       Foreign table "fdw_stage.TABLE_PRIVILEGES"
+     Column     |          Type          | Collation | Nullable | Default | FDW options 
+----------------+------------------------+-----------+----------+---------+-------------
+ GRANTEE        | character varying(292) |           | not null |         | 
+ TABLE_CATALOG  | character varying(512) |           | not null |         | 
+ TABLE_SCHEMA   | character varying(64)  |           | not null |         | 
+ TABLE_NAME     | character varying(64)  |           | not null |         | 
+ PRIVILEGE_TYPE | character varying(64)  |           | not null |         | 
+ IS_GRANTABLE   | character varying(3)   |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'TABLE_PRIVILEGES')
+
+                            Foreign table "fdw_stage.TRIGGERS"
+       Column       |         Type          | Collation | Nullable | Default | FDW options 
+--------------------+-----------------------+-----------+----------+---------+-------------
+ TRIGGER_SCHEMA     | character varying(64) |           | not null |         | 
+ TRIGGER_NAME       | character varying(64) |           | not null |         | 
+ EVENT_MANIPULATION | character varying(6)  |           | not null |         | 
+ EVENT_OBJECT_TABLE | character varying(64) |           | not null |         | 
+ ACTION_STATEMENT   | text                  |           | not null |         | 
+ ACTION_ORIENTATION | character varying(3)  |           | not null |         | 
+ ACTION_TIMING      | character varying(6)  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'TRIGGERS')
+
+                               Foreign table "fdw_stage.VIEWS"
+        Column        |          Type          | Collation | Nullable | Default | FDW options 
+----------------------+------------------------+-----------+----------+---------+-------------
+ TABLE_CATALOG        | character varying(64)  |           | not null |         | 
+ TABLE_SCHEMA         | character varying(64)  |           | not null |         | 
+ TABLE_NAME           | character varying(64)  |           | not null |         | 
+ VIEW_DEFINITION      | text                   |           |          |         | 
+ CHECK_OPTION         | text                   |           |          |         | 
+ IS_UPDATABLE         | text                   |           |          |         | 
+ DEFINER              | character varying(288) |           |          |         | 
+ SECURITY_TYPE        | character varying(7)   |           |          |         | 
+ CHARACTER_SET_CLIENT | character varying(64)  |           | not null |         | 
+ COLLATION_CONNECTION | character varying(64)  |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'VIEWS')
+
+                         View "fdw_stage.checks"
+     Column      |         Type          | Collation | Nullable | Default 
+-----------------+-----------------------+-----------+----------+---------
+ schema          | character varying(64) |           |          | 
+ table_name      | character varying(64) |           |          | 
+ constraint_name | character varying(64) |           |          | 
+ deferrable      | boolean               |           |          | 
+ deferred        | boolean               |           |          | 
+ condition       | text                  |           |          | 
+
+                     View "fdw_stage.column_privs"
+   Column    |          Type          | Collation | Nullable | Default 
+-------------+------------------------+-----------+----------+---------
+ schema      | character varying(64)  |           |          | 
+ table_name  | character varying(64)  |           |          | 
+ column_name | character varying(64)  |           |          | 
+ privilege   | character varying(64)  |           |          | 
+ grantor     | character varying(292) |           |          | 
+ grantee     | character varying(292) |           |          | 
+ grantable   | boolean                |           |          | 
+
+                        View "fdw_stage.columns"
+    Column     |         Type          | Collation | Nullable | Default 
+---------------+-----------------------+-----------+----------+---------
+ schema        | character varying(64) |           |          | 
+ table_name    | character varying(64) |           |          | 
+ column_name   | character varying(64) |           |          | 
+ position      | integer               |           |          | 
+ type_name     | text                  |           |          | 
+ length        | bigint                |           |          | 
+ precision     | bigint                |           |          | 
+ scale         | bigint                |           |          | 
+ nullable      | boolean               |           |          | 
+ default_value | text                  |           |          | 
+
+                      View "fdw_stage.foreign_keys"
+     Column      |         Type          | Collation | Nullable | Default 
+-----------------+-----------------------+-----------+----------+---------
+ schema          | character varying(64) |           |          | 
+ table_name      | character varying(64) |           |          | 
+ constraint_name | character varying(64) |           |          | 
+ deferrable      | boolean               |           |          | 
+ deferred        | boolean               |           |          | 
+ delete_rule     | text                  |           |          | 
+ position        | integer               |           |          | 
+ remote_schema   | character varying(64) |           |          | 
+ remote_table    | character varying(64) |           |          | 
+ remote_column   | character varying(64) |           |          | 
+
+                       View "fdw_stage.functions"
+    Column     |         Type          | Collation | Nullable | Default 
+---------------+-----------------------+-----------+----------+---------
+ schema        | character varying(64) |           |          | 
+ function_name | character varying(64) |           |          | 
+ is_procedure  | boolean               |           |          | 
+ source        | text                  |           |          | 
+
+                     View "fdw_stage.index_columns"
+     Column     |         Type          | Collation | Nullable | Default 
+----------------+-----------------------+-----------+----------+---------
+ schema         | character varying(64) |           |          | 
+ table_name     | character varying(64) |           |          | 
+ index_name     | character varying(64) |           |          | 
+ position       | integer               |           |          | 
+ descend        | boolean               |           |          | 
+ col_name       | character varying(64) |           |          | 
+ col_expression | text                  |           |          | 
+
+                      View "fdw_stage.indexes"
+   Column   |         Type          | Collation | Nullable | Default 
+------------+-----------------------+-----------+----------+---------
+ schema     | character varying(64) |           |          | 
+ table_name | character varying(64) |           |          | 
+ index_name | character varying(64) |           |          | 
+ index_type | character varying(11) |           |          | 
+ uniqueness | boolean               |           |          | 
+
+                       Foreign table "fdw_stage.innodb_index_stats"
+      Column      |          Type           | Collation | Nullable | Default | FDW options 
+------------------+-------------------------+-----------+----------+---------+-------------
+ database_name    | character varying(64)   |           | not null |         | 
+ table_name       | character varying(64)   |           | not null |         | 
+ index_name       | character varying(64)   |           | not null |         | 
+ stat_value       | bigint                  |           | not null |         | 
+ stat_description | character varying(1024) |           | not null |         | 
+Server: mysql
+FDW options: (dbname 'mysql', table_name 'innodb_index_stats')
+
+                          View "fdw_stage.keys"
+     Column      |         Type          | Collation | Nullable | Default 
+-----------------+-----------------------+-----------+----------+---------
+ schema          | character varying(64) |           |          | 
+ table_name      | character varying(64) |           |          | 
+ constraint_name | character varying(64) |           |          | 
+ deferrable      | boolean               |           |          | 
+ deferred        | boolean               |           |          | 
+ column_name     | character varying(64) |           |          | 
+ position        | integer               |           |          | 
+ is_primary      | boolean               |           |          | 
+
+                 View "fdw_stage.migration_cost_estimate"
+     Column      |         Type          | Collation | Nullable | Default 
+-----------------+-----------------------+-----------+----------+---------
+ schema          | character varying(64) |           |          | 
+ task_type       | text                  |           |          | 
+ task_content    | bigint                |           |          | 
+ task_unit       | text                  |           |          | 
+ migration_hours | integer               |           |          | 
+
+                       View "fdw_stage.packages"
+    Column    |         Type          | Collation | Nullable | Default 
+--------------+-----------------------+-----------+----------+---------
+ schema       | character varying(64) |           |          | 
+ package_name | character varying(64) |           |          | 
+ is_body      | boolean               |           |          | 
+ source       | text                  |           |          | 
+
+                    View "fdw_stage.schemas"
+ Column |         Type          | Collation | Nullable | Default 
+--------+-----------------------+-----------+----------+---------
+ schema | character varying(64) |           |          | 
+
+                       View "fdw_stage.segments"
+    Column    |         Type          | Collation | Nullable | Default 
+--------------+-----------------------+-----------+----------+---------
+ schema       | character varying(64) |           |          | 
+ segment_name | character varying(64) |           |          | 
+ segment_type | text                  |           |          | 
+ bytes        | numeric               |           |          | 
+
+                       View "fdw_stage.sequences"
+    Column     |         Type          | Collation | Nullable | Default 
+---------------+-----------------------+-----------+----------+---------
+ schema        | character varying(64) |           |          | 
+ sequence_name | text                  |           |          | 
+ min_value     | integer               |           |          | 
+ max_value     | integer               |           |          | 
+ increment_by  | integer               |           |          | 
+ cyclical      | boolean               |           |          | 
+ cache_size    | integer               |           |          | 
+ last_value    | bigint                |           |          | 
+
+                     View "fdw_stage.table_privs"
+   Column   |          Type          | Collation | Nullable | Default 
+------------+------------------------+-----------+----------+---------
+ schema     | character varying(64)  |           |          | 
+ table_name | character varying(64)  |           |          | 
+ privilege  | character varying(64)  |           |          | 
+ grantor    | character varying(292) |           |          | 
+ grantee    | character varying(292) |           |          | 
+ grantable  | boolean                |           |          | 
+
+                       View "fdw_stage.tables"
+   Column   |         Type          | Collation | Nullable | Default 
+------------+-----------------------+-----------+----------+---------
+ schema     | character varying(64) |           |          | 
+ table_name | character varying(64) |           |          | 
+
+                           Table "fdw_stage.test_error"
+   Column   |           Type           | Collation | Nullable |      Default      
+------------+--------------------------+-----------+----------+-------------------
+ log_time   | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ schema     | name                     |           | not null | 
+ table_name | name                     |           | not null | 
+ rowid      | text                     |           | not null | 
+ message    | text                     |           | not null | 
+Indexes:
+    "test_error_pkey" PRIMARY KEY, btree (schema, table_name, log_time, rowid)
+
+             Index "fdw_stage.test_error_pkey"
+   Column   |           Type           | Key? | Definition 
+------------+--------------------------+------+------------
+ schema     | cstring                  | yes  | schema
+ table_name | cstring                  | yes  | table_name
+ log_time   | timestamp with time zone | yes  | log_time
+ rowid      | text                     | yes  | rowid
+primary key, btree, for table "fdw_stage.test_error"
+
+                   Table "fdw_stage.test_error_stats"
+   Column   |           Type           | Collation | Nullable | Default 
+------------+--------------------------+-----------+----------+---------
+ log_time   | timestamp with time zone |           | not null | 
+ schema     | name                     |           | not null | 
+ table_name | name                     |           | not null | 
+ errcount   | bigint                   |           | not null | 
+Indexes:
+    "test_error_stats_pkey" PRIMARY KEY, btree (schema, table_name, log_time)
+
+          Index "fdw_stage.test_error_stats_pkey"
+   Column   |           Type           | Key? | Definition 
+------------+--------------------------+------+------------
+ schema     | cstring                  | yes  | schema
+ table_name | cstring                  | yes  | table_name
+ log_time   | timestamp with time zone | yes  | log_time
+primary key, btree, for table "fdw_stage.test_error_stats"
+
+                         View "fdw_stage.triggers"
+      Column       |         Type          | Collation | Nullable | Default 
+-------------------+-----------------------+-----------+----------+---------
+ schema            | character varying(64) |           |          | 
+ table_name        | character varying(64) |           |          | 
+ trigger_name      | character varying(64) |           |          | 
+ trigger_type      | character varying(6)  |           |          | 
+ triggering_event  | character varying(6)  |           |          | 
+ for_each_row      | boolean               |           |          | 
+ when_clause       | text                  |           |          | 
+ referencing_names | text                  |           |          | 
+ trigger_body      | text                  |           |          | 
+
+                       View "fdw_stage.views"
+   Column   |         Type          | Collation | Nullable | Default 
+------------+-----------------------+-----------+----------+---------
+ schema     | character varying(64) |           |          | 
+ view_name  | character varying(64) |           |          | 
+ definition | text                  |           |          | 
+
+SELECT * FROM fdw_stage.schemas ORDER BY schema;
+ schema 
+--------
+ sakila
+(1 row)
+
+SELECT * FROM fdw_stage.tables ORDER BY schema, table_name;
+ schema |  table_name   
+--------+---------------
+ sakila | actor
+ sakila | address
+ sakila | category
+ sakila | city
+ sakila | country
+ sakila | customer
+ sakila | film
+ sakila | film_actor
+ sakila | film_category
+ sakila | film_text
+ sakila | inventory
+ sakila | language
+ sakila | payment
+ sakila | rental
+ sakila | staff
+ sakila | store
+(16 rows)
+
+SELECT * FROM fdw_stage.columns ORDER BY schema, table_name, position;
+ schema |         table_name         |     column_name      | position | type_name | length | precision | scale | nullable |   default_value   
+--------+----------------------------+----------------------+----------+-----------+--------+-----------+-------+----------+-------------------
+ sakila | actor                      | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | actor                      | first_name           |        2 | varchar   |     45 |           |       | f        | 
+ sakila | actor                      | last_name            |        3 | varchar   |     45 |           |       | f        | 
+ sakila | actor                      | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | actor_info                 | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 0
+ sakila | actor_info                 | first_name           |        2 | varchar   |     45 |           |       | f        | 
+ sakila | actor_info                 | last_name            |        3 | varchar   |     45 |           |       | f        | 
+ sakila | actor_info                 | film_info            |        4 | text      |  65535 |           |       | t        | 
+ sakila | address                    | address_id           |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | address                    | address              |        2 | varchar   |     50 |           |       | f        | 
+ sakila | address                    | address2             |        3 | varchar   |     50 |           |       | t        | 
+ sakila | address                    | district             |        4 | varchar   |     20 |           |       | f        | 
+ sakila | address                    | city_id              |        5 | smallint  |        |         5 |     0 | f        | 
+ sakila | address                    | postal_code          |        6 | varchar   |     10 |           |       | t        | 
+ sakila | address                    | phone                |        7 | varchar   |     20 |           |       | f        | 
+ sakila | address                    | location             |        8 | geometry  |        |           |       | f        | 
+ sakila | address                    | last_update          |        9 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | category                   | category_id          |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila | category                   | name                 |        2 | varchar   |     25 |           |       | f        | 
+ sakila | category                   | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | city                       | city_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | city                       | city                 |        2 | varchar   |     50 |           |       | f        | 
+ sakila | city                       | country_id           |        3 | smallint  |        |         5 |     0 | f        | 
+ sakila | city                       | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | country                    | country_id           |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | country                    | country              |        2 | varchar   |     50 |           |       | f        | 
+ sakila | country                    | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | customer                   | customer_id          |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | customer                   | store_id             |        2 | tinyint   |        |         3 |     0 | f        | 
+ sakila | customer                   | first_name           |        3 | varchar   |     45 |           |       | f        | 
+ sakila | customer                   | last_name            |        4 | varchar   |     45 |           |       | f        | 
+ sakila | customer                   | email                |        5 | varchar   |     50 |           |       | t        | 
+ sakila | customer                   | address_id           |        6 | smallint  |        |         5 |     0 | f        | 
+ sakila | customer                   | active               |        7 | tinyint   |        |         3 |     0 | f        | 1
+ sakila | customer                   | create_date          |        8 | datetime  |        |         0 |       | f        | 
+ sakila | customer                   | last_update          |        9 | timestamp |        |         0 |       | t        | CURRENT_TIMESTAMP
+ sakila | customer_list              | ID                   |        1 | smallint  |        |         5 |     0 | f        | 0
+ sakila | customer_list              | name                 |        2 | varchar   |     91 |           |       | t        | 
+ sakila | customer_list              | address              |        3 | varchar   |     50 |           |       | f        | 
+ sakila | customer_list              | zip code             |        4 | varchar   |     10 |           |       | t        | 
+ sakila | customer_list              | phone                |        5 | varchar   |     20 |           |       | f        | 
+ sakila | customer_list              | city                 |        6 | varchar   |     50 |           |       | f        | 
+ sakila | customer_list              | country              |        7 | varchar   |     50 |           |       | f        | 
+ sakila | customer_list              | notes                |        8 | varchar   |      6 |           |       | f        | 
+ sakila | customer_list              | SID                  |        9 | tinyint   |        |         3 |     0 | f        | 
+ sakila | film                       | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | film                       | title                |        2 | varchar   |    128 |           |       | f        | 
+ sakila | film                       | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila | film                       | release_year         |        4 | year      |        |           |       | t        | 
+ sakila | film                       | language_id          |        5 | tinyint   |        |         3 |     0 | f        | 
+ sakila | film                       | original_language_id |        6 | tinyint   |        |         3 |     0 | t        | 
+ sakila | film                       | rental_duration      |        7 | tinyint   |        |         3 |     0 | f        | 3
+ sakila | film                       | rental_rate          |        8 | decimal   |        |         4 |     2 | f        | 4.99
+ sakila | film                       | length               |        9 | smallint  |        |         5 |     0 | t        | 
+ sakila | film                       | replacement_cost     |       10 | decimal   |        |         5 |     2 | f        | 19.99
+ sakila | film                       | rating               |       11 | enum      |      5 |           |       | t        | G
+ sakila | film                       | special_features     |       12 | set       |     54 |           |       | t        | 
+ sakila | film                       | last_update          |       13 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | film_actor                 | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | film_actor                 | film_id              |        2 | smallint  |        |         5 |     0 | f        | 
+ sakila | film_actor                 | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | film_category              | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | film_category              | category_id          |        2 | tinyint   |        |         3 |     0 | f        | 
+ sakila | film_category              | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | film_list                  | FID                  |        1 | smallint  |        |         5 |     0 | t        | 0
+ sakila | film_list                  | title                |        2 | varchar   |    128 |           |       | t        | 
+ sakila | film_list                  | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila | film_list                  | category             |        4 | varchar   |     25 |           |       | f        | 
+ sakila | film_list                  | price                |        5 | decimal   |        |         4 |     2 | t        | 4.99
+ sakila | film_list                  | length               |        6 | smallint  |        |         5 |     0 | t        | 
+ sakila | film_list                  | rating               |        7 | enum      |      5 |           |       | t        | G
+ sakila | film_list                  | actors               |        8 | text      |  65535 |           |       | t        | 
+ sakila | film_text                  | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | film_text                  | title                |        2 | varchar   |    255 |           |       | f        | 
+ sakila | film_text                  | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila | inventory                  | inventory_id         |        1 | mediumint |        |         7 |     0 | f        | 
+ sakila | inventory                  | film_id              |        2 | smallint  |        |         5 |     0 | f        | 
+ sakila | inventory                  | store_id             |        3 | tinyint   |        |         3 |     0 | f        | 
+ sakila | inventory                  | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | language                   | language_id          |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila | language                   | name                 |        2 | char      |     20 |           |       | f        | 
+ sakila | language                   | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | nicer_but_slower_film_list | FID                  |        1 | smallint  |        |         5 |     0 | t        | 0
+ sakila | nicer_but_slower_film_list | title                |        2 | varchar   |    128 |           |       | t        | 
+ sakila | nicer_but_slower_film_list | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila | nicer_but_slower_film_list | category             |        4 | varchar   |     25 |           |       | f        | 
+ sakila | nicer_but_slower_film_list | price                |        5 | decimal   |        |         4 |     2 | t        | 4.99
+ sakila | nicer_but_slower_film_list | length               |        6 | smallint  |        |         5 |     0 | t        | 
+ sakila | nicer_but_slower_film_list | rating               |        7 | enum      |      5 |           |       | t        | G
+ sakila | nicer_but_slower_film_list | actors               |        8 | text      |  65535 |           |       | t        | 
+ sakila | payment                    | payment_id           |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila | payment                    | customer_id          |        2 | smallint  |        |         5 |     0 | f        | 
+ sakila | payment                    | staff_id             |        3 | tinyint   |        |         3 |     0 | f        | 
+ sakila | payment                    | rental_id            |        4 | int       |        |        10 |     0 | t        | 
+ sakila | payment                    | amount               |        5 | decimal   |        |         5 |     2 | f        | 
+ sakila | payment                    | payment_date         |        6 | datetime  |        |         0 |       | f        | 
+ sakila | payment                    | last_update          |        7 | timestamp |        |         0 |       | t        | CURRENT_TIMESTAMP
+ sakila | rental                     | rental_id            |        1 | int       |        |        10 |     0 | f        | 
+ sakila | rental                     | rental_date          |        2 | datetime  |        |         0 |       | f        | 
+ sakila | rental                     | inventory_id         |        3 | mediumint |        |         7 |     0 | f        | 
+ sakila | rental                     | customer_id          |        4 | smallint  |        |         5 |     0 | f        | 
+ sakila | rental                     | return_date          |        5 | datetime  |        |         0 |       | t        | 
+ sakila | rental                     | staff_id             |        6 | tinyint   |        |         3 |     0 | f        | 
+ sakila | rental                     | last_update          |        7 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | sales_by_film_category     | category             |        1 | varchar   |     25 |           |       | f        | 
+ sakila | sales_by_film_category     | total_sales          |        2 | decimal   |        |        27 |     2 | t        | 
+ sakila | sales_by_store             | store                |        1 | varchar   |    101 |           |       | t        | 
+ sakila | sales_by_store             | manager              |        2 | varchar   |     91 |           |       | t        | 
+ sakila | sales_by_store             | total_sales          |        3 | decimal   |        |        27 |     2 | t        | 
+ sakila | staff                      | staff_id             |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila | staff                      | first_name           |        2 | varchar   |     45 |           |       | f        | 
+ sakila | staff                      | last_name            |        3 | varchar   |     45 |           |       | f        | 
+ sakila | staff                      | address_id           |        4 | smallint  |        |         5 |     0 | f        | 
+ sakila | staff                      | picture              |        5 | blob      |  65535 |           |       | t        | 
+ sakila | staff                      | email                |        6 | varchar   |     50 |           |       | t        | 
+ sakila | staff                      | store_id             |        7 | tinyint   |        |         3 |     0 | f        | 
+ sakila | staff                      | active               |        8 | tinyint   |        |         3 |     0 | f        | 1
+ sakila | staff                      | username             |        9 | varchar   |     16 |           |       | f        | 
+ sakila | staff                      | password             |       10 | varchar   |     40 |           |       | t        | 
+ sakila | staff                      | last_update          |       11 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila | staff_list                 | ID                   |        1 | tinyint   |        |         3 |     0 | f        | 0
+ sakila | staff_list                 | name                 |        2 | varchar   |     91 |           |       | t        | 
+ sakila | staff_list                 | address              |        3 | varchar   |     50 |           |       | f        | 
+ sakila | staff_list                 | zip code             |        4 | varchar   |     10 |           |       | t        | 
+ sakila | staff_list                 | phone                |        5 | varchar   |     20 |           |       | f        | 
+ sakila | staff_list                 | city                 |        6 | varchar   |     50 |           |       | f        | 
+ sakila | staff_list                 | country              |        7 | varchar   |     50 |           |       | f        | 
+ sakila | staff_list                 | SID                  |        8 | tinyint   |        |         3 |     0 | f        | 
+ sakila | store                      | store_id             |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila | store                      | manager_staff_id     |        2 | tinyint   |        |         3 |     0 | f        | 
+ sakila | store                      | address_id           |        3 | smallint  |        |         5 |     0 | f        | 
+ sakila | store                      | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+(132 rows)
+
+SELECT * FROM fdw_stage.checks ORDER BY schema, table_name, constraint_name;
+ schema | table_name | constraint_name | deferrable | deferred | condition 
+--------+------------+-----------------+------------+----------+-----------
+(0 rows)
+
+SELECT * FROM fdw_stage.foreign_keys ORDER BY schema, table_name, constraint_name, position;
+ schema |  table_name   |      constraint_name      | deferrable | deferred | delete_rule | position | remote_schema | remote_table | remote_column 
+--------+---------------+---------------------------+------------+----------+-------------+----------+---------------+--------------+---------------
+ sakila | address       | fk_address_city           | f          | f        | RESTRICT    |        1 | sakila        | city         | city_id
+ sakila | city          | fk_city_country           | f          | f        | RESTRICT    |        1 | sakila        | country      | country_id
+ sakila | customer      | fk_customer_address       | f          | f        | RESTRICT    |        1 | sakila        | address      | address_id
+ sakila | customer      | fk_customer_store         | f          | f        | RESTRICT    |        1 | sakila        | store        | store_id
+ sakila | film          | fk_film_language          | f          | f        | RESTRICT    |        1 | sakila        | language     | language_id
+ sakila | film          | fk_film_language_original | f          | f        | RESTRICT    |        1 | sakila        | language     | language_id
+ sakila | film_actor    | fk_film_actor_actor       | f          | f        | RESTRICT    |        1 | sakila        | actor        | actor_id
+ sakila | film_actor    | fk_film_actor_film        | f          | f        | RESTRICT    |        1 | sakila        | film         | film_id
+ sakila | film_category | fk_film_category_category | f          | f        | RESTRICT    |        1 | sakila        | category     | category_id
+ sakila | film_category | fk_film_category_film     | f          | f        | RESTRICT    |        1 | sakila        | film         | film_id
+ sakila | inventory     | fk_inventory_film         | f          | f        | RESTRICT    |        1 | sakila        | film         | film_id
+ sakila | inventory     | fk_inventory_store        | f          | f        | RESTRICT    |        1 | sakila        | store        | store_id
+ sakila | payment       | fk_payment_customer       | f          | f        | RESTRICT    |        1 | sakila        | customer     | customer_id
+ sakila | payment       | fk_payment_rental         | f          | f        | SET NULL    |        1 | sakila        | rental       | rental_id
+ sakila | payment       | fk_payment_staff          | f          | f        | RESTRICT    |        1 | sakila        | staff        | staff_id
+ sakila | rental        | fk_rental_customer        | f          | f        | RESTRICT    |        1 | sakila        | customer     | customer_id
+ sakila | rental        | fk_rental_inventory       | f          | f        | RESTRICT    |        1 | sakila        | inventory    | inventory_id
+ sakila | rental        | fk_rental_staff           | f          | f        | RESTRICT    |        1 | sakila        | staff        | staff_id
+ sakila | staff         | fk_staff_address          | f          | f        | RESTRICT    |        1 | sakila        | address      | address_id
+ sakila | staff         | fk_staff_store            | f          | f        | RESTRICT    |        1 | sakila        | store        | store_id
+ sakila | store         | fk_store_address          | f          | f        | RESTRICT    |        1 | sakila        | address      | address_id
+ sakila | store         | fk_store_staff            | f          | f        | RESTRICT    |        1 | sakila        | staff        | staff_id
+(22 rows)
+
+SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, position;
+ schema |  table_name   |  constraint_name   | deferrable | deferred |   column_name    | position | is_primary 
+--------+---------------+--------------------+------------+----------+------------------+----------+------------
+ sakila | actor         | PRIMARY            | f          | f        | actor_id         |        1 | t
+ sakila | address       | PRIMARY            | f          | f        | address_id       |        1 | t
+ sakila | category      | PRIMARY            | f          | f        | category_id      |        1 | t
+ sakila | city          | PRIMARY            | f          | f        | city_id          |        1 | t
+ sakila | country       | PRIMARY            | f          | f        | country_id       |        1 | t
+ sakila | customer      | PRIMARY            | f          | f        | customer_id      |        1 | t
+ sakila | film          | PRIMARY            | f          | f        | film_id          |        1 | t
+ sakila | film_actor    | PRIMARY            | f          | f        | actor_id         |        1 | t
+ sakila | film_actor    | PRIMARY            | f          | f        | film_id          |        2 | t
+ sakila | film_category | PRIMARY            | f          | f        | film_id          |        1 | t
+ sakila | film_category | PRIMARY            | f          | f        | category_id      |        2 | t
+ sakila | film_text     | PRIMARY            | f          | f        | film_id          |        1 | t
+ sakila | inventory     | PRIMARY            | f          | f        | inventory_id     |        1 | t
+ sakila | language      | PRIMARY            | f          | f        | language_id      |        1 | t
+ sakila | payment       | PRIMARY            | f          | f        | payment_id       |        1 | t
+ sakila | rental        | PRIMARY            | f          | f        | rental_id        |        1 | t
+ sakila | rental        | rental_date        | f          | f        | rental_date      |        1 | f
+ sakila | rental        | rental_date        | f          | f        | inventory_id     |        2 | f
+ sakila | rental        | rental_date        | f          | f        | customer_id      |        3 | f
+ sakila | staff         | PRIMARY            | f          | f        | staff_id         |        1 | t
+ sakila | store         | PRIMARY            | f          | f        | store_id         |        1 | t
+ sakila | store         | idx_unique_manager | f          | f        | manager_staff_id |        1 | f
+(22 rows)
+
+SELECT * FROM fdw_stage.views ORDER BY schema, view_name;
+ schema |         view_name          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+--------+----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ sakila | actor_info                 | select `a`.`actor_id` AS `actor_id`,`a`.`first_name` AS `first_name`,`a`.`last_name` AS `last_name`,group_concat(distinct concat(`c`.`name`,': ',(select group_concat(`f`.`title` order by `f`.`title` ASC separator ', ') from ((`sakila`.`film` `f` join `sakila`.`film_category` `fc` on((`f`.`film_id` = `fc`.`film_id`))) join `sakila`.`film_actor` `fa` on((`f`.`film_id` = `fa`.`film_id`))) where ((`fc`.`category_id` = `c`.`category_id`) and (`fa`.`actor_id` = `a`.`actor_id`)))) order by `c`.`name` ASC separator '; ') AS `film_info` from (((`sakila`.`actor` `a` left join `sakila`.`film_actor` `fa` on((`a`.`actor_id` = `fa`.`actor_id`))) left join `sakila`.`film_category` `fc` on((`fa`.`film_id` = `fc`.`film_id`))) left join `sakila`.`category` `c` on((`fc`.`category_id` = `c`.`category_id`))) group by `a`.`actor_id`,`a`.`first_name`,`a`.`last_name`
+ sakila | customer_list              | select `cu`.`customer_id` AS `ID`,concat(`cu`.`first_name`,' ',`cu`.`last_name`) AS `name`,`a`.`address` AS `address`,`a`.`postal_code` AS `zip code`,`a`.`phone` AS `phone`,`sakila`.`city`.`city` AS `city`,`sakila`.`country`.`country` AS `country`,if(`cu`.`active`,'active','') AS `notes`,`cu`.`store_id` AS `SID` from (((`sakila`.`customer` `cu` join `sakila`.`address` `a` on((`cu`.`address_id` = `a`.`address_id`))) join `sakila`.`city` on((`a`.`city_id` = `sakila`.`city`.`city_id`))) join `sakila`.`country` on((`sakila`.`city`.`country_id` = `sakila`.`country`.`country_id`)))
+ sakila | film_list                  | select `sakila`.`film`.`film_id` AS `FID`,`sakila`.`film`.`title` AS `title`,`sakila`.`film`.`description` AS `description`,`sakila`.`category`.`name` AS `category`,`sakila`.`film`.`rental_rate` AS `price`,`sakila`.`film`.`length` AS `length`,`sakila`.`film`.`rating` AS `rating`,group_concat(concat(`sakila`.`actor`.`first_name`,' ',`sakila`.`actor`.`last_name`) separator ', ') AS `actors` from ((((`sakila`.`category` left join `sakila`.`film_category` on((`sakila`.`category`.`category_id` = `sakila`.`film_category`.`category_id`))) left join `sakila`.`film` on((`sakila`.`film_category`.`film_id` = `sakila`.`film`.`film_id`))) join `sakila`.`film_actor` on((`sakila`.`film`.`film_id` = `sakila`.`film_actor`.`film_id`))) join `sakila`.`actor` on((`sakila`.`film_actor`.`actor_id` = `sakila`.`actor`.`actor_id`))) group by `sakila`.`film`.`film_id`,`sakila`.`category`.`name`
+ sakila | nicer_but_slower_film_list | select `sakila`.`film`.`film_id` AS `FID`,`sakila`.`film`.`title` AS `title`,`sakila`.`film`.`description` AS `description`,`sakila`.`category`.`name` AS `category`,`sakila`.`film`.`rental_rate` AS `price`,`sakila`.`film`.`length` AS `length`,`sakila`.`film`.`rating` AS `rating`,group_concat(concat(concat(upper(substr(`sakila`.`actor`.`first_name`,1,1)),lower(substr(`sakila`.`actor`.`first_name`,2,length(`sakila`.`actor`.`first_name`))),' ',concat(upper(substr(`sakila`.`actor`.`last_name`,1,1)),lower(substr(`sakila`.`actor`.`last_name`,2,length(`sakila`.`actor`.`last_name`)))))) separator ', ') AS `actors` from ((((`sakila`.`category` left join `sakila`.`film_category` on((`sakila`.`category`.`category_id` = `sakila`.`film_category`.`category_id`))) left join `sakila`.`film` on((`sakila`.`film_category`.`film_id` = `sakila`.`film`.`film_id`))) join `sakila`.`film_actor` on((`sakila`.`film`.`film_id` = `sakila`.`film_actor`.`film_id`))) join `sakila`.`actor` on((`sakila`.`film_actor`.`actor_id` = `sakila`.`actor`.`actor_id`))) group by `sakila`.`film`.`film_id`,`sakila`.`category`.`name`
+ sakila | sales_by_film_category     | select `c`.`name` AS `category`,sum(`p`.`amount`) AS `total_sales` from (((((`sakila`.`payment` `p` join `sakila`.`rental` `r` on((`p`.`rental_id` = `r`.`rental_id`))) join `sakila`.`inventory` `i` on((`r`.`inventory_id` = `i`.`inventory_id`))) join `sakila`.`film` `f` on((`i`.`film_id` = `f`.`film_id`))) join `sakila`.`film_category` `fc` on((`f`.`film_id` = `fc`.`film_id`))) join `sakila`.`category` `c` on((`fc`.`category_id` = `c`.`category_id`))) group by `c`.`name` order by `total_sales` desc
+ sakila | sales_by_store             | select concat(`c`.`city`,',',`cy`.`country`) AS `store`,concat(`m`.`first_name`,' ',`m`.`last_name`) AS `manager`,sum(`p`.`amount`) AS `total_sales` from (((((((`sakila`.`payment` `p` join `sakila`.`rental` `r` on((`p`.`rental_id` = `r`.`rental_id`))) join `sakila`.`inventory` `i` on((`r`.`inventory_id` = `i`.`inventory_id`))) join `sakila`.`store` `s` on((`i`.`store_id` = `s`.`store_id`))) join `sakila`.`address` `a` on((`s`.`address_id` = `a`.`address_id`))) join `sakila`.`city` `c` on((`a`.`city_id` = `c`.`city_id`))) join `sakila`.`country` `cy` on((`c`.`country_id` = `cy`.`country_id`))) join `sakila`.`staff` `m` on((`s`.`manager_staff_id` = `m`.`staff_id`))) group by `s`.`store_id` order by `cy`.`country`,`c`.`city`
+ sakila | staff_list                 | select `s`.`staff_id` AS `ID`,concat(`s`.`first_name`,' ',`s`.`last_name`) AS `name`,`a`.`address` AS `address`,`a`.`postal_code` AS `zip code`,`a`.`phone` AS `phone`,`sakila`.`city`.`city` AS `city`,`sakila`.`country`.`country` AS `country`,`s`.`store_id` AS `SID` from (((`sakila`.`staff` `s` join `sakila`.`address` `a` on((`s`.`address_id` = `a`.`address_id`))) join `sakila`.`city` on((`a`.`city_id` = `sakila`.`city`.`city_id`))) join `sakila`.`country` on((`sakila`.`city`.`country_id` = `sakila`.`country`.`country_id`)))
+(7 rows)
+
+SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
+ schema |       function_name        | is_procedure |                                                                              source                                                                              
+--------+----------------------------+--------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ sakila | film_in_stock              | t            | CREATE PROCEDURE film_in_stock ( IN p_film_id int, IN p_store_id int, OUT p_film_count int ) BEGIN                                                              +
+        |                            |              |      SELECT inventory_id                                                                                                                                        +
+        |                            |              |      FROM inventory                                                                                                                                             +
+        |                            |              |      WHERE film_id = p_film_id                                                                                                                                  +
+        |                            |              |      AND store_id = p_store_id                                                                                                                                  +
+        |                            |              |      AND inventory_in_stock(inventory_id);                                                                                                                      +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |      SELECT COUNT(*)                                                                                                                                            +
+        |                            |              |      FROM inventory                                                                                                                                             +
+        |                            |              |      WHERE film_id = p_film_id                                                                                                                                  +
+        |                            |              |      AND store_id = p_store_id                                                                                                                                  +
+        |                            |              |      AND inventory_in_stock(inventory_id)                                                                                                                       +
+        |                            |              |      INTO p_film_count;                                                                                                                                         +
+        |                            |              | END
+ sakila | film_in_stock_2            | t            | CREATE PROCEDURE film_in_stock_2 ( IN p_film_id int, IN p_store_id int, OUT p_film_count int ) BEGIN                                                            +
+        |                            |              |       SELECT inventory_id                                                                                                                                       +
+        |                            |              |       FROM inventory                                                                                                                                            +
+        |                            |              |       WHERE film_id = p_film_id                                                                                                                                 +
+        |                            |              |       AND store_id = p_store_id                                                                                                                                 +
+        |                            |              |       AND inventory_in_stock(inventory_id);                                                                                                                     +
+        |                            |              |       SELECT COUNT(*)                                                                                                                                           +
+        |                            |              |       FROM inventory                                                                                                                                            +
+        |                            |              |       WHERE film_id = p_film_id                                                                                                                                 +
+        |                            |              |       AND store_id = p_store_id                                                                                                                                 +
+        |                            |              |       AND inventory_in_stock(inventory_id)                                                                                                                      +
+        |                            |              |       INTO p_film_count;                                                                                                                                        +
+        |                            |              |  END
+ sakila | film_not_in_stock          | t            | CREATE PROCEDURE film_not_in_stock ( IN p_film_id int, IN p_store_id int, OUT p_film_count int ) BEGIN                                                          +
+        |                            |              |      SELECT inventory_id                                                                                                                                        +
+        |                            |              |      FROM inventory                                                                                                                                             +
+        |                            |              |      WHERE film_id = p_film_id                                                                                                                                  +
+        |                            |              |      AND store_id = p_store_id                                                                                                                                  +
+        |                            |              |      AND NOT inventory_in_stock(inventory_id);                                                                                                                  +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |      SELECT COUNT(*)                                                                                                                                            +
+        |                            |              |      FROM inventory                                                                                                                                             +
+        |                            |              |      WHERE film_id = p_film_id                                                                                                                                  +
+        |                            |              |      AND store_id = p_store_id                                                                                                                                  +
+        |                            |              |      AND NOT inventory_in_stock(inventory_id)                                                                                                                   +
+        |                            |              |      INTO p_film_count;                                                                                                                                         +
+        |                            |              | END
+ sakila | get_customer_balance       | f            | CREATE FUNCTION get_customer_balance ( IN p_customer_id int, IN p_effective_date datetime ) RETURNS decimal(5,2) BEGIN                                          +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   DECLARE v_rentfees DECIMAL(5,2);                                                                                                                              +
+        |                            |              |   DECLARE v_overfees INTEGER;                                                                                                                                   +
+        |                            |              |   DECLARE v_payments DECIMAL(5,2);                                                                                                                              +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   SELECT IFNULL(SUM(film.rental_rate),0) INTO v_rentfees                                                                                                        +
+        |                            |              |     FROM film, inventory, rental                                                                                                                                +
+        |                            |              |     WHERE film.film_id = inventory.film_id                                                                                                                      +
+        |                            |              |       AND inventory.inventory_id = rental.inventory_id                                                                                                          +
+        |                            |              |       AND rental.rental_date <= p_effective_date                                                                                                                +
+        |                            |              |       AND rental.customer_id = p_customer_id;                                                                                                                   +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   SELECT IFNULL(SUM(IF((TO_DAYS(rental.return_date) - TO_DAYS(rental.rental_date)) > film.rental_duration,                                                      +
+        |                            |              |         ((TO_DAYS(rental.return_date) - TO_DAYS(rental.rental_date)) - film.rental_duration),0)),0) INTO v_overfees                                             +
+        |                            |              |     FROM rental, inventory, film                                                                                                                                +
+        |                            |              |     WHERE film.film_id = inventory.film_id                                                                                                                      +
+        |                            |              |       AND inventory.inventory_id = rental.inventory_id                                                                                                          +
+        |                            |              |       AND rental.rental_date <= p_effective_date                                                                                                                +
+        |                            |              |       AND rental.customer_id = p_customer_id;                                                                                                                   +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   SELECT IFNULL(SUM(payment.amount),0) INTO v_payments                                                                                                          +
+        |                            |              |     FROM payment                                                                                                                                                +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     WHERE payment.payment_date <= p_effective_date                                                                                                              +
+        |                            |              |     AND payment.customer_id = p_customer_id;                                                                                                                    +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   RETURN v_rentfees + v_overfees - v_payments;                                                                                                                  +
+        |                            |              | END
+ sakila | inventory_held_by_customer | f            | CREATE FUNCTION inventory_held_by_customer ( IN p_inventory_id int ) RETURNS int BEGIN                                                                          +
+        |                            |              |   DECLARE v_customer_id INT;                                                                                                                                    +
+        |                            |              |   DECLARE EXIT HANDLER FOR NOT FOUND RETURN NULL;                                                                                                               +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   SELECT customer_id INTO v_customer_id                                                                                                                         +
+        |                            |              |   FROM rental                                                                                                                                                   +
+        |                            |              |   WHERE return_date IS NULL                                                                                                                                     +
+        |                            |              |   AND inventory_id = p_inventory_id;                                                                                                                            +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |   RETURN v_customer_id;                                                                                                                                         +
+        |                            |              | END
+ sakila | inventory_in_stock         | f            | CREATE FUNCTION inventory_in_stock ( IN p_inventory_id int ) RETURNS tinyint(1) BEGIN                                                                           +
+        |                            |              |     DECLARE v_rentals INT;                                                                                                                                      +
+        |                            |              |     DECLARE v_out     INT;                                                                                                                                      +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     SELECT COUNT(*) INTO v_rentals                                                                                                                              +
+        |                            |              |     FROM rental                                                                                                                                                 +
+        |                            |              |     WHERE inventory_id = p_inventory_id;                                                                                                                        +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     IF v_rentals = 0 THEN                                                                                                                                       +
+        |                            |              |       RETURN TRUE;                                                                                                                                              +
+        |                            |              |     END IF;                                                                                                                                                     +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     SELECT COUNT(rental_id) INTO v_out                                                                                                                          +
+        |                            |              |     FROM inventory LEFT JOIN rental USING(inventory_id)                                                                                                         +
+        |                            |              |     WHERE inventory.inventory_id = p_inventory_id                                                                                                               +
+        |                            |              |     AND rental.return_date IS NULL;                                                                                                                             +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     IF v_out > 0 THEN                                                                                                                                           +
+        |                            |              |       RETURN FALSE;                                                                                                                                             +
+        |                            |              |     ELSE                                                                                                                                                        +
+        |                            |              |       RETURN TRUE;                                                                                                                                              +
+        |                            |              |     END IF;                                                                                                                                                     +
+        |                            |              | END
+ sakila | rewards_report             | t            | CREATE PROCEDURE rewards_report ( IN min_monthly_purchases tinyint unsigned, IN min_dollar_amount_purchased decimal(10,2), OUT count_rewardees int ) proc: BEGIN+
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     DECLARE last_month_start DATE;                                                                                                                              +
+        |                            |              |     DECLARE last_month_end DATE;                                                                                                                                +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     IF min_monthly_purchases = 0 THEN                                                                                                                           +
+        |                            |              |         SELECT 'Minimum monthly purchases parameter must be > 0';                                                                                               +
+        |                            |              |         LEAVE proc;                                                                                                                                             +
+        |                            |              |     END IF;                                                                                                                                                     +
+        |                            |              |     IF min_dollar_amount_purchased = 0.00 THEN                                                                                                                  +
+        |                            |              |         SELECT 'Minimum monthly dollar amount purchased parameter must be > $0.00';                                                                             +
+        |                            |              |         LEAVE proc;                                                                                                                                             +
+        |                            |              |     END IF;                                                                                                                                                     +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     SET last_month_start = DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH);                                                                                          +
+        |                            |              |     SET last_month_start = STR_TO_DATE(CONCAT(YEAR(last_month_start),'-',MONTH(last_month_start),'-01'),'%Y-%m-%d');                                            +
+        |                            |              |     SET last_month_end = LAST_DAY(last_month_start);                                                                                                            +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     CREATE TEMPORARY TABLE tmpCustomer (customer_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY);                                                                    +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     INSERT INTO tmpCustomer (customer_id)                                                                                                                       +
+        |                            |              |     SELECT p.customer_id                                                                                                                                        +
+        |                            |              |     FROM payment AS p                                                                                                                                           +
+        |                            |              |     WHERE DATE(p.payment_date) BETWEEN last_month_start AND last_month_end                                                                                      +
+        |                            |              |     GROUP BY customer_id                                                                                                                                        +
+        |                            |              |     HAVING SUM(p.amount) > min_dollar_amount_purchased                                                                                                          +
+        |                            |              |     AND COUNT(customer_id) > min_monthly_purchases;                                                                                                             +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     SELECT COUNT(*) FROM tmpCustomer INTO count_rewardees;                                                                                                      +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     SELECT c.*                                                                                                                                                  +
+        |                            |              |     FROM tmpCustomer AS t                                                                                                                                       +
+        |                            |              |     INNER JOIN customer AS c ON t.customer_id = c.customer_id;                                                                                                  +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |                                                                                                                                                                 +
+        |                            |              |     DROP TABLE tmpCustomer;                                                                                                                                     +
+        |                            |              | END
+(7 rows)
+
+SELECT * FROM fdw_stage.sequences ORDER BY schema, sequence_name;
+ schema | sequence_name | min_value | max_value | increment_by | cyclical | cache_size | last_value 
+--------+---------------+-----------+-----------+--------------+----------+------------+------------
+ sakila | actor_seq     |         1 |           |            1 | f        |          1 |        201
+ sakila | address_seq   |         1 |           |            1 | f        |          1 |        606
+ sakila | category_seq  |         1 |           |            1 | f        |          1 |         17
+ sakila | city_seq      |         1 |           |            1 | f        |          1 |        601
+ sakila | country_seq   |         1 |           |            1 | f        |          1 |        110
+ sakila | customer_seq  |         1 |           |            1 | f        |          1 |        600
+ sakila | film_seq      |         1 |           |            1 | f        |          1 |       1001
+ sakila | inventory_seq |         1 |           |            1 | f        |          1 |       4582
+ sakila | language_seq  |         1 |           |            1 | f        |          1 |          7
+ sakila | payment_seq   |         1 |           |            1 | f        |          1 |      16050
+ sakila | rental_seq    |         1 |           |            1 | f        |          1 |      16050
+ sakila | staff_seq     |         1 |           |            1 | f        |          1 |          3
+ sakila | store_seq     |         1 |           |            1 | f        |          1 |          3
+(13 rows)
+
+SELECT * FROM fdw_stage.index_columns ORDER BY schema, table_name, index_name, position;
+ schema |  table_name   |         index_name          | position | descend |       col_name       | col_expression 
+--------+---------------+-----------------------------+----------+---------+----------------------+----------------
+ sakila | actor         | idx_actor_last_name         |        1 | f       | last_name            | 
+ sakila | address       | idx_fk_city_id              |        1 | f       | city_id              | 
+ sakila | address       | idx_location                |        1 | f       | location             | 
+ sakila | city          | idx_fk_country_id           |        1 | f       | country_id           | 
+ sakila | customer      | idx_fk_address_id           |        1 | f       | address_id           | 
+ sakila | customer      | idx_fk_store_id             |        1 | f       | store_id             | 
+ sakila | customer      | idx_last_name               |        1 | f       | last_name            | 
+ sakila | film          | idx_fk_language_id          |        1 | f       | language_id          | 
+ sakila | film          | idx_fk_original_language_id |        1 | f       | original_language_id | 
+ sakila | film          | idx_title                   |        1 | f       | title                | 
+ sakila | film_actor    | idx_fk_film_id              |        1 | f       | film_id              | 
+ sakila | film_category | fk_film_category_category   |        1 | f       | category_id          | 
+ sakila | film_text     | idx_title_description       |        1 | f       | title                | 
+ sakila | film_text     | idx_title_description       |        2 | f       | description          | 
+ sakila | inventory     | idx_fk_film_id              |        1 | f       | film_id              | 
+ sakila | inventory     | idx_store_id_film_id        |        1 | f       | store_id             | 
+ sakila | inventory     | idx_store_id_film_id        |        2 | f       | film_id              | 
+ sakila | payment       | fk_payment_rental           |        1 | f       | rental_id            | 
+ sakila | payment       | idx_fk_customer_id          |        1 | f       | customer_id          | 
+ sakila | payment       | idx_fk_staff_id             |        1 | f       | staff_id             | 
+ sakila | rental        | idx_fk_customer_id          |        1 | f       | customer_id          | 
+ sakila | rental        | idx_fk_inventory_id         |        1 | f       | inventory_id         | 
+ sakila | rental        | idx_fk_staff_id             |        1 | f       | staff_id             | 
+ sakila | rental        | rental_date                 |        1 | f       | rental_date          | 
+ sakila | rental        | rental_date                 |        2 | f       | inventory_id         | 
+ sakila | rental        | rental_date                 |        3 | f       | customer_id          | 
+ sakila | staff         | idx_fk_address_id           |        1 | f       | address_id           | 
+ sakila | staff         | idx_fk_store_id             |        1 | f       | store_id             | 
+ sakila | store         | idx_fk_address_id           |        1 | f       | address_id           | 
+ sakila | store         | idx_unique_manager          |        1 | f       | manager_staff_id     | 
+(30 rows)
+
+SELECT * FROM fdw_stage.indexes ORDER BY schema, table_name, index_name;
+ schema |  table_name   |         index_name          | index_type | uniqueness 
+--------+---------------+-----------------------------+------------+------------
+ sakila | actor         | idx_actor_last_name         | BTREE      | f
+ sakila | address       | idx_fk_city_id              | BTREE      | f
+ sakila | address       | idx_location                | SPATIAL    | f
+ sakila | city          | idx_fk_country_id           | BTREE      | f
+ sakila | customer      | idx_fk_address_id           | BTREE      | f
+ sakila | customer      | idx_fk_store_id             | BTREE      | f
+ sakila | customer      | idx_last_name               | BTREE      | f
+ sakila | film          | idx_fk_language_id          | BTREE      | f
+ sakila | film          | idx_fk_original_language_id | BTREE      | f
+ sakila | film          | idx_title                   | BTREE      | f
+ sakila | film_actor    | idx_fk_film_id              | BTREE      | f
+ sakila | film_category | fk_film_category_category   | BTREE      | f
+ sakila | film_text     | idx_title_description       | FULLTEXT   | f
+ sakila | inventory     | idx_fk_film_id              | BTREE      | f
+ sakila | inventory     | idx_store_id_film_id        | BTREE      | f
+ sakila | payment       | fk_payment_rental           | BTREE      | f
+ sakila | payment       | idx_fk_customer_id          | BTREE      | f
+ sakila | payment       | idx_fk_staff_id             | BTREE      | f
+ sakila | rental        | idx_fk_customer_id          | BTREE      | f
+ sakila | rental        | idx_fk_inventory_id         | BTREE      | f
+ sakila | rental        | idx_fk_staff_id             | BTREE      | f
+ sakila | rental        | rental_date                 | BTREE      | t
+ sakila | staff         | idx_fk_address_id           | BTREE      | f
+ sakila | staff         | idx_fk_store_id             | BTREE      | f
+ sakila | store         | idx_fk_address_id           | BTREE      | f
+ sakila | store         | idx_unique_manager          | BTREE      | t
+(26 rows)
+
+SELECT * FROM fdw_stage.triggers ORDER BY schema, table_name, trigger_name;
+ schema | table_name |     trigger_name     | trigger_type | triggering_event | for_each_row | when_clause |         referencing_names         |                                              trigger_body                                               
+--------+------------+----------------------+--------------+------------------+--------------+-------------+-----------------------------------+---------------------------------------------------------------------------------------------------------
+ sakila | customer   | customer_create_date | BEFORE       | INSERT           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | SET NEW.create_date = NOW()
+ sakila | film       | del_film             | AFTER        | DELETE           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | BEGIN                                                                                                  +
+        |            |                      |              |                  |              |             |                                   |     DELETE FROM film_text WHERE film_id = old.film_id;                                                 +
+        |            |                      |              |                  |              |             |                                   |   END
+ sakila | film       | ins_film             | AFTER        | INSERT           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | BEGIN                                                                                                  +
+        |            |                      |              |                  |              |             |                                   |     INSERT INTO film_text (film_id, title, description)                                                +
+        |            |                      |              |                  |              |             |                                   |         VALUES (new.film_id, new.title, new.description);                                              +
+        |            |                      |              |                  |              |             |                                   |   END
+ sakila | film       | upd_film             | AFTER        | UPDATE           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | BEGIN                                                                                                  +
+        |            |                      |              |                  |              |             |                                   |     IF (old.title != new.title) OR (old.description != new.description) OR (old.film_id != new.film_id)+
+        |            |                      |              |                  |              |             |                                   |     THEN                                                                                               +
+        |            |                      |              |                  |              |             |                                   |         UPDATE film_text                                                                               +
+        |            |                      |              |                  |              |             |                                   |             SET title=new.title,                                                                       +
+        |            |                      |              |                  |              |             |                                   |                 description=new.description,                                                           +
+        |            |                      |              |                  |              |             |                                   |                 film_id=new.film_id                                                                    +
+        |            |                      |              |                  |              |             |                                   |         WHERE film_id=old.film_id;                                                                     +
+        |            |                      |              |                  |              |             |                                   |     END IF;                                                                                            +
+        |            |                      |              |                  |              |             |                                   |   END
+ sakila | payment    | payment_date         | BEFORE       | INSERT           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | SET NEW.payment_date = NOW()
+ sakila | rental     | rental_date          | BEFORE       | INSERT           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | SET NEW.rental_date = NOW()
+(6 rows)
+
+SELECT * FROM fdw_stage.packages;
+ schema | package_name | is_body | source 
+--------+--------------+---------+--------
+(0 rows)
+
+SELECT * FROM fdw_stage.table_privs ORDER BY schema, table_name, privilege;
+ schema | table_name | privilege | grantor |   grantee    | grantable 
+--------+------------+-----------+---------+--------------+-----------
+ sakila | actor      | SELECT    |         | 'sakila'@'%' | f
+(1 row)
+
+SELECT * FROM fdw_stage.column_privs ORDER BY schema, table_name, privilege;
+ schema | table_name | column_name | privilege | grantor |   grantee    | grantable 
+--------+------------+-------------+-----------+---------+--------------+-----------
+ sakila | actor      | last_name   | SELECT    |         | 'sakila'@'%' | f
+ sakila | actor      | first_name  | SELECT    |         | 'sakila'@'%' | f
+(2 rows)
+
+SELECT * FROM fdw_stage.segments ORDER BY schema, segment_name, segment_type;
+ schema |        segment_name         | segment_type | bytes  
+--------+-----------------------------+--------------+--------
+ sakila | actor                       | TABLE        |  16384
+ sakila | address                     | TABLE        |  98304
+ sakila | category                    | TABLE        |  16384
+ sakila | city                        | TABLE        |  49152
+ sakila | country                     | TABLE        |  16384
+ sakila | customer                    | TABLE        |  81920
+ sakila | film                        | TABLE        | 196608
+ sakila | film_actor                  | TABLE        | 196608
+ sakila | film_category               | TABLE        |  65536
+ sakila | film_text                   | TABLE        | 180224
+ sakila | fk_film_category_category   | INDEX        |  16384
+ sakila | fk_payment_rental           | INDEX        |  16384
+ sakila | FTS_DOC_ID_INDEX            | INDEX        |  16384
+ sakila | idx_actor_last_name         | INDEX        |  16384
+ sakila | idx_fk_address_id           | INDEX        |  49152
+ sakila | idx_fk_city_id              | INDEX        |  16384
+ sakila | idx_fk_country_id           | INDEX        |  16384
+ sakila | idx_fk_customer_id          | INDEX        |  32768
+ sakila | idx_fk_film_id              | INDEX        | 163840
+ sakila | idx_fk_inventory_id         | INDEX        |  16384
+ sakila | idx_fk_language_id          | INDEX        |  16384
+ sakila | idx_fk_original_language_id | INDEX        |  16384
+ sakila | idx_fk_staff_id             | INDEX        |  32768
+ sakila | idx_fk_store_id             | INDEX        |  32768
+ sakila | idx_last_name               | INDEX        |  16384
+ sakila | idx_store_id_film_id        | INDEX        | 114688
+ sakila | idx_title                   | INDEX        |  49152
+ sakila | idx_unique_manager          | INDEX        |  16384
+ sakila | inventory                   | TABLE        | 180224
+ sakila | language                    | TABLE        |  16384
+ sakila | payment                     | TABLE        |  16384
+ sakila | rental                      | TABLE        |  16384
+ sakila | rental_date                 | INDEX        |  16384
+ sakila | staff                       | TABLE        |  16384
+ sakila | store                       | TABLE        |  16384
+(35 rows)
+
+SELECT * FROM fdw_stage.migration_cost_estimate ORDER BY schema, task_type;
+ schema |   task_type    | task_content | task_unit  | migration_hours 
+--------+----------------+--------------+------------+-----------------
+ sakila | data_migration |      1179648 | bytes      |               1
+ sakila | functions      |         5562 | characters |              11
+ sakila | tables         |           16 | count      |               2
+ sakila | triggers       |          583 | characters |               2
+ sakila | views          |         5183 | characters |              11
+(5 rows)
+
