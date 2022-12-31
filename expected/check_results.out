@@ -660,7 +660,7 @@ SELECT * FROM fdw_stage.foreign_keys ORDER BY schema, table_name, constraint_nam
  sakila | store         | fk_store_staff            | f          | f        | RESTRICT    | manager_staff_id     |        1 | sakila        | staff        | staff_id
 (22 rows)
 
-SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, position;
+SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, constraint_name, position;
  schema |  table_name   |        constraint_name         | deferrable | deferred |   column_name    | position | is_primary 
 --------+---------------+--------------------------------+------------+----------+------------------+----------+------------
  sakila | actor         | actor_actor_id_pkey            | f          | f        | actor_id         |        1 | t
@@ -672,19 +672,19 @@ SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, position;
  sakila | film          | film_film_id_pkey              | f          | f        | film_id          |        1 | t
  sakila | film_actor    | film_actor_actor_id_pkey       | f          | f        | actor_id         |        1 | t
  sakila | film_actor    | film_actor_film_id_pkey        | f          | f        | film_id          |        2 | t
- sakila | film_category | film_category_film_id_pkey     | f          | f        | film_id          |        1 | t
  sakila | film_category | film_category_category_id_pkey | f          | f        | category_id      |        2 | t
+ sakila | film_category | film_category_film_id_pkey     | f          | f        | film_id          |        1 | t
  sakila | film_text     | film_text_film_id_pkey         | f          | f        | film_id          |        1 | t
  sakila | inventory     | inventory_inventory_id_pkey    | f          | f        | inventory_id     |        1 | t
  sakila | language      | language_language_id_pkey      | f          | f        | language_id      |        1 | t
  sakila | payment       | payment_payment_id_pkey        | f          | f        | payment_id       |        1 | t
- sakila | rental        | rental_rental_id_pkey          | f          | f        | rental_id        |        1 | t
  sakila | rental        | rental_date                    | f          | f        | rental_date      |        1 | f
  sakila | rental        | rental_date                    | f          | f        | inventory_id     |        2 | f
  sakila | rental        | rental_date                    | f          | f        | customer_id      |        3 | f
+ sakila | rental        | rental_rental_id_pkey          | f          | f        | rental_id        |        1 | t
  sakila | staff         | staff_staff_id_pkey            | f          | f        | staff_id         |        1 | t
- sakila | store         | store_store_id_pkey            | f          | f        | store_id         |        1 | t
  sakila | store         | idx_unique_manager             | f          | f        | manager_staff_id |        1 | f
+ sakila | store         | store_store_id_pkey            | f          | f        | store_id         |        1 | t
 (22 rows)
 
 SELECT * FROM fdw_stage.views ORDER BY schema, view_name;
@@ -716,19 +716,6 @@ SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
         |                            |              |      AND inventory_in_stock(inventory_id)                                                                                                                       +
         |                            |              |      INTO p_film_count;                                                                                                                                         +
         |                            |              | END
- sakila | film_in_stock_2            | t            | CREATE PROCEDURE film_in_stock_2 ( IN p_film_id int, IN p_store_id int, OUT p_film_count int ) BEGIN                                                            +
-        |                            |              |       SELECT inventory_id                                                                                                                                       +
-        |                            |              |       FROM inventory                                                                                                                                            +
-        |                            |              |       WHERE film_id = p_film_id                                                                                                                                 +
-        |                            |              |       AND store_id = p_store_id                                                                                                                                 +
-        |                            |              |       AND inventory_in_stock(inventory_id);                                                                                                                     +
-        |                            |              |       SELECT COUNT(*)                                                                                                                                           +
-        |                            |              |       FROM inventory                                                                                                                                            +
-        |                            |              |       WHERE film_id = p_film_id                                                                                                                                 +
-        |                            |              |       AND store_id = p_store_id                                                                                                                                 +
-        |                            |              |       AND inventory_in_stock(inventory_id)                                                                                                                      +
-        |                            |              |       INTO p_film_count;                                                                                                                                        +
-        |                            |              |  END
  sakila | film_not_in_stock          | t            | CREATE PROCEDURE film_not_in_stock ( IN p_film_id int, IN p_store_id int, OUT p_film_count int ) BEGIN                                                          +
         |                            |              |      SELECT inventory_id                                                                                                                                        +
         |                            |              |      FROM inventory                                                                                                                                             +
@@ -745,16 +732,16 @@ SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
         |                            |              | END
  sakila | get_customer_balance       | f            | CREATE FUNCTION get_customer_balance ( IN p_customer_id int, IN p_effective_date datetime ) RETURNS decimal(5,2) BEGIN                                          +
         |                            |              |                                                                                                                                                                 +
+        |                            |              |        #OK, WE NEED TO CALCULATE THE CURRENT BALANCE GIVEN A CUSTOMER_ID AND A DATE                                                                             +
+        |                            |              |        #THAT WE WANT THE BALANCE TO BE EFFECTIVE FOR. THE BALANCE IS:                                                                                           +
+        |                            |              |        #   1) RENTAL FEES FOR ALL PREVIOUS RENTALS                                                                                                              +
+        |                            |              |        #   2) ONE DOLLAR FOR EVERY DAY THE PREVIOUS RENTALS ARE OVERDUE                                                                                         +
+        |                            |              |        #   3) IF A FILM IS MORE THAN RENTAL_DURATION * 2 OVERDUE, CHARGE THE REPLACEMENT_COST                                                                   +
+        |                            |              |        #   4) SUBTRACT ALL PAYMENTS MADE BEFORE THE DATE SPECIFIED                                                                                              +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |   DECLARE v_rentfees DECIMAL(5,2);                                                                                                                              +
-        |                            |              |   DECLARE v_overfees INTEGER;                                                                                                                                   +
-        |                            |              |   DECLARE v_payments DECIMAL(5,2);                                                                                                                              +
+        |                            |              |   DECLARE v_rentfees DECIMAL(5,2); #FEES PAID TO RENT THE VIDEOS INITIALLY                                                                                      +
+        |                            |              |   DECLARE v_overfees INTEGER;      #LATE FEES FOR PRIOR RENTALS                                                                                                 +
+        |                            |              |   DECLARE v_payments DECIMAL(5,2); #SUM OF PAYMENTS MADE PREVIOUSLY                                                                                             +
         |                            |              |                                                                                                                                                                 +
         |                            |              |   SELECT IFNULL(SUM(film.rental_rate),0) INTO v_rentfees                                                                                                        +
         |                            |              |     FROM film, inventory, rental                                                                                                                                +
@@ -795,8 +782,8 @@ SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
         |                            |              |     DECLARE v_rentals INT;                                                                                                                                      +
         |                            |              |     DECLARE v_out     INT;                                                                                                                                      +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     #AN ITEM IS IN-STOCK IF THERE ARE EITHER NO ROWS IN THE rental TABLE                                                                                        +
+        |                            |              |     #FOR THE ITEM OR ALL ROWS HAVE return_date POPULATED                                                                                                        +
         |                            |              |                                                                                                                                                                 +
         |                            |              |     SELECT COUNT(*) INTO v_rentals                                                                                                                              +
         |                            |              |     FROM rental                                                                                                                                                 +
@@ -822,7 +809,7 @@ SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
         |                            |              |     DECLARE last_month_start DATE;                                                                                                                              +
         |                            |              |     DECLARE last_month_end DATE;                                                                                                                                +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /* Some sanity checks... */                                                                                                                                 +
         |                            |              |     IF min_monthly_purchases = 0 THEN                                                                                                                           +
         |                            |              |         SELECT 'Minimum monthly purchases parameter must be > 0';                                                                                               +
         |                            |              |         LEAVE proc;                                                                                                                                             +
@@ -832,15 +819,21 @@ SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
         |                            |              |         LEAVE proc;                                                                                                                                             +
         |                            |              |     END IF;                                                                                                                                                     +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /* Determine start and end time periods */                                                                                                                  +
         |                            |              |     SET last_month_start = DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH);                                                                                          +
         |                            |              |     SET last_month_start = STR_TO_DATE(CONCAT(YEAR(last_month_start),'-',MONTH(last_month_start),'-01'),'%Y-%m-%d');                                            +
         |                            |              |     SET last_month_end = LAST_DAY(last_month_start);                                                                                                            +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /*                                                                                                                                                          +
+        |                            |              |         Create a temporary storage area for                                                                                                                     +
+        |                            |              |         Customer IDs.                                                                                                                                           +
+        |                            |              |     */                                                                                                                                                          +
         |                            |              |     CREATE TEMPORARY TABLE tmpCustomer (customer_id SMALLINT UNSIGNED NOT NULL PRIMARY KEY);                                                                    +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /*                                                                                                                                                          +
+        |                            |              |         Find all customers meeting the                                                                                                                          +
+        |                            |              |         monthly purchase requirements                                                                                                                           +
+        |                            |              |     */                                                                                                                                                          +
         |                            |              |     INSERT INTO tmpCustomer (customer_id)                                                                                                                       +
         |                            |              |     SELECT p.customer_id                                                                                                                                        +
         |                            |              |     FROM payment AS p                                                                                                                                           +
@@ -849,35 +842,38 @@ SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
         |                            |              |     HAVING SUM(p.amount) > min_dollar_amount_purchased                                                                                                          +
         |                            |              |     AND COUNT(customer_id) > min_monthly_purchases;                                                                                                             +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /* Populate OUT parameter with count of found customers */                                                                                                  +
         |                            |              |     SELECT COUNT(*) FROM tmpCustomer INTO count_rewardees;                                                                                                      +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /*                                                                                                                                                          +
+        |                            |              |         Output ALL customer information of matching rewardees.                                                                                                  +
+        |                            |              |         Customize output as needed.                                                                                                                             +
+        |                            |              |     */                                                                                                                                                          +
         |                            |              |     SELECT c.*                                                                                                                                                  +
         |                            |              |     FROM tmpCustomer AS t                                                                                                                                       +
         |                            |              |     INNER JOIN customer AS c ON t.customer_id = c.customer_id;                                                                                                  +
         |                            |              |                                                                                                                                                                 +
-        |                            |              |                                                                                                                                                                 +
+        |                            |              |     /* Clean up */                                                                                                                                              +
         |                            |              |     DROP TABLE tmpCustomer;                                                                                                                                     +
         |                            |              | END
-(7 rows)
+(6 rows)
 
 SELECT * FROM fdw_stage.sequences ORDER BY schema, sequence_name;
  schema | sequence_name | min_value | max_value | increment_by | cyclical | cache_size | last_value 
 --------+---------------+-----------+-----------+--------------+----------+------------+------------
- sakila | actor_seq     |         1 |           |            1 | f        |          1 |        201
- sakila | address_seq   |         1 |           |            1 | f        |          1 |        606
- sakila | category_seq  |         1 |           |            1 | f        |          1 |         17
- sakila | city_seq      |         1 |           |            1 | f        |          1 |        601
- sakila | country_seq   |         1 |           |            1 | f        |          1 |        110
- sakila | customer_seq  |         1 |           |            1 | f        |          1 |        600
- sakila | film_seq      |         1 |           |            1 | f        |          1 |       1001
- sakila | inventory_seq |         1 |           |            1 | f        |          1 |       4582
- sakila | language_seq  |         1 |           |            1 | f        |          1 |          7
- sakila | payment_seq   |         1 |           |            1 | f        |          1 |      16050
- sakila | rental_seq    |         1 |           |            1 | f        |          1 |      16050
- sakila | staff_seq     |         1 |           |            1 | f        |          1 |          3
- sakila | store_seq     |         1 |           |            1 | f        |          1 |          3
+ sakila | actor_seq     |         1 |           |            1 | f        |          1 |        200
+ sakila | address_seq   |         1 |           |            1 | f        |          1 |        605
+ sakila | category_seq  |         1 |           |            1 | f        |          1 |         16
+ sakila | city_seq      |         1 |           |            1 | f        |          1 |        600
+ sakila | country_seq   |         1 |           |            1 | f        |          1 |        109
+ sakila | customer_seq  |         1 |           |            1 | f        |          1 |        599
+ sakila | film_seq      |         1 |           |            1 | f        |          1 |       1000
+ sakila | inventory_seq |         1 |           |            1 | f        |          1 |       4581
+ sakila | language_seq  |         1 |           |            1 | f        |          1 |          6
+ sakila | payment_seq   |         1 |           |            1 | f        |          1 |      16049
+ sakila | rental_seq    |         1 |           |            1 | f        |          1 |      16049
+ sakila | staff_seq     |         1 |           |            1 | f        |          1 |          2
+ sakila | store_seq     |         1 |           |            1 | f        |          1 |          2
 (13 rows)
 
 SELECT * FROM fdw_stage.index_columns ORDER BY schema, table_name, index_name, position;
@@ -977,17 +973,14 @@ SELECT * FROM fdw_stage.packages;
 (0 rows)
 
 SELECT * FROM fdw_stage.table_privs ORDER BY schema, table_name, privilege;
- schema | table_name | privilege | grantor |   grantee    | grantable 
---------+------------+-----------+---------+--------------+-----------
- sakila | actor      | SELECT    | root    | 'sakila'@'%' | f
-(1 row)
+ schema | table_name | privilege | grantor | grantee | grantable 
+--------+------------+-----------+---------+---------+-----------
+(0 rows)
 
 SELECT * FROM fdw_stage.column_privs ORDER BY schema, table_name, privilege;
- schema | table_name | column_name | privilege | grantor |   grantee    | grantable 
---------+------------+-------------+-----------+---------+--------------+-----------
- sakila | actor      | last_name   | SELECT    | root    | 'sakila'@'%' | f
- sakila | actor      | first_name  | SELECT    | root    | 'sakila'@'%' | f
-(2 rows)
+ schema | table_name | column_name | privilege | grantor | grantee | grantable 
+--------+------------+-------------+-----------+---------+---------+-----------
+(0 rows)
 
 SELECT * FROM fdw_stage.segments ORDER BY schema, segment_name, segment_type;
  schema |        segment_name         | segment_type | bytes  
@@ -1033,7 +1026,7 @@ SELECT * FROM fdw_stage.migration_cost_estimate ORDER BY schema, task_type;
  schema |   task_type    | task_content | task_unit  | migration_hours 
 --------+----------------+--------------+------------+-----------------
  sakila | data_migration |      1179648 | bytes      |               1
- sakila | functions      |         5562 | characters |              11
+ sakila | functions      |         5387 | characters |              11
  sakila | tables         |           16 | count      |               2
  sakila | triggers       |          583 | characters |               2
  sakila | views          |         5183 | characters |              11

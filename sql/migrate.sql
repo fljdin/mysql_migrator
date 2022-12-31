@@ -1,10 +1,5 @@
 /*
  * Test migration from MySQL.
- *
- * This requires that a sakiladb container is running
- * docker run -p 3306:3306 --name sakiladb -d sakiladb/mysql:latest
- *
- * - views' definer must be 'root@%' instead of 'root@localhost'
  */
 
 SET client_min_messages = WARNING;
@@ -19,7 +14,7 @@ CREATE EXTENSION mysql_migrator CASCADE;
 
 /* create a foreign server and a user mapping */
 CREATE SERVER mysql FOREIGN DATA WRAPPER mysql_fdw
-   OPTIONS (fetch_size '1000');
+   OPTIONS (host 'mysql_db', fetch_size '1000');
 
 CREATE USER MAPPING FOR PUBLIC SERVER mysql
    OPTIONS (username 'root', password 'p_ssW0rd');

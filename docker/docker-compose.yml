@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  mysql_db:
+    image: sakiladb/mysql:latest
+    networks:
+      - common
+    ports:
+      - "3306:3306"
+  
+  postgresql_db:
+    build:
+      context: ./pg
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_INITDB_ARGS: --data-checksums
+    networks:
+      - common
+    volumes:
+      - ..:/usr/local/src/mysql_migrator
+    ports:
+      - "5432:5432"
+
+networks:
+  common:

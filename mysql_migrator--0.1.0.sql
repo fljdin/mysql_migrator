@@ -237,7 +237,7 @@ DECLARE
             "PRIVILEGE_TYPE" AS privilege, 'root'::varchar(292) AS grantor,
             "GRANTEE" as grantee, "IS_GRANTABLE"::boolean AS grantable
          FROM %1$I."TABLE_PRIVILEGES"
-         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" !~ 'root';
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" NOT LIKE '%%root%%';
       COMMENT ON VIEW %1$I.table_privs IS 'Privileges on MySQL tables on foreign server "%3$I"';
    $$;
 
@@ -248,7 +248,7 @@ DECLARE
             "COLUMN_NAME" AS column_name, "PRIVILEGE_TYPE" AS privilege,
             'root'::varchar(292) AS grantor, "GRANTEE" AS grantee, "IS_GRANTABLE"::boolean AS grantable
          FROM %1$I."COLUMN_PRIVILEGES"
-         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" !~ 'root';
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" NOT LIKE '%%root%%';
       COMMENT ON VIEW %1$I.column_privs IS 'Privileges on MySQL table columns on foreign server "%3$I"';
    $$;
 

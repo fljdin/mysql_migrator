@@ -9,7 +9,7 @@ SELECT * FROM fdw_stage.tables ORDER BY schema, table_name;
 SELECT * FROM fdw_stage.columns ORDER BY schema, table_name, position;
 SELECT * FROM fdw_stage.checks ORDER BY schema, table_name, constraint_name;
 SELECT * FROM fdw_stage.foreign_keys ORDER BY schema, table_name, constraint_name, position;
-SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, position;
+SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, constraint_name, position;
 SELECT * FROM fdw_stage.views ORDER BY schema, view_name;
 SELECT * FROM fdw_stage.functions ORDER BY schema, function_name;
 SELECT * FROM fdw_stage.sequences ORDER BY schema, sequence_name;
