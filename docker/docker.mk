@@ -1,7 +1,7 @@
 export COMPOSE_FILE=docker/docker-compose.yml
 export COMPOSE_PROJECT_NAME=mysql_migrator
 
-export PGHOST=172.19.0.2
+export PGHOST=172.19.0.3
 export PGPORT=5432
 export PGUSER=postgres
 

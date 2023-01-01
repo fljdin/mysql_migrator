@@ -56,12 +56,12 @@ DECLARE
    /* checks */
    check_sql text := $$
       CREATE OR REPLACE VIEW %1$I.checks AS
-         SELECT "CONSTRAINT_SCHEMA" AS schema, "TABLE_SCHEMA" as table_name,
+         SELECT "CONSTRAINT_SCHEMA" AS schema, "TABLE_NAME" as table_name,
             "CONSTRAINT_NAME" AS constraint_name, false AS "deferrable", false AS deferred,
             "CHECK_CLAUSE" AS condition
          FROM %1$I."TABLE_CONSTRAINTS" cons
          JOIN %1$I."CHECK_CONSTRAINTS" cond USING ("CONSTRAINT_SCHEMA", "CONSTRAINT_NAME")
-         WHERE "TABLE_SCHEMA" NOT IN (%2$s);
+         WHERE "CONSTRAINT_SCHEMA" NOT IN (%2$s);
       COMMENT ON VIEW %1$I.checks IS 'MySQL check constraints on foreign server "%3$I"';
    $$;
 
@@ -237,7 +237,7 @@ DECLARE
             "PRIVILEGE_TYPE" AS privilege, 'root'::varchar(292) AS grantor,
             "GRANTEE" as grantee, "IS_GRANTABLE"::boolean AS grantable
          FROM %1$I."TABLE_PRIVILEGES"
-         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" NOT LIKE '%%root%%';
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" !~* 'root';
       COMMENT ON VIEW %1$I.table_privs IS 'Privileges on MySQL tables on foreign server "%3$I"';
    $$;
 
@@ -248,7 +248,7 @@ DECLARE
             "COLUMN_NAME" AS column_name, "PRIVILEGE_TYPE" AS privilege,
             'root'::varchar(292) AS grantor, "GRANTEE" AS grantee, "IS_GRANTABLE"::boolean AS grantable
          FROM %1$I."COLUMN_PRIVILEGES"
-         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" NOT LIKE '%%root%%';
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "GRANTEE" !~* 'root';
       COMMENT ON VIEW %1$I.column_privs IS 'Privileges on MySQL table columns on foreign server "%3$I"';
    $$;
 
@@ -467,33 +467,33 @@ BEGIN
    CASE
       -- numeric types
       -- 
-      WHEN v_type IN ('TINYINT UNSIGNED', 'TINYINT', 'SMALLINT', 'YEAR') THEN RETURN 'smallint';
-      WHEN v_type IN ('SMALLINT UNSIGNED', 'MEDIUMINT UNSIGNED', 'MEDIUMINT', 'INT') THEN RETURN 'integer';
-      WHEN v_type IN ('INT UNSIGNED', 'BIGINT', 'UNSIGNED') THEN RETURN 'bigint';
-      WHEN v_type IN ('DECIMAL', 'DEC') THEN RETURN 'decimal';
-      WHEN v_type IN ( 'FLOAT', 'DOUBLE PRECISION', 'DOUBLE') THEN RETURN 'double precision';
-      WHEN v_type IN ('BIGINT UNSIGNED', 'NUMERIC', 'FIXED') THEN RETURN 'numeric';
-      WHEN v_type IN ('REAL') THEN RETURN 'real';
+      WHEN v_type IN ('tinyint unsigned', 'tinyint', 'smallint', 'year') THEN RETURN 'smallint';
+      WHEN v_type IN ('smallint unsigned', 'mediumint unsigned', 'mediumint', 'int') THEN RETURN 'integer';
+      WHEN v_type IN ('int unsigned', 'bigint', 'unsigned') THEN RETURN 'bigint';
+      WHEN v_type IN ('decimal', 'dec') THEN RETURN format('decimal(%s,%s)', v_precision, v_scale);
+      WHEN v_type IN ('float', 'double precision', 'double') THEN RETURN 'double precision';
+      WHEN v_type IN ('bigint unsigned', 'numeric', 'fixed') THEN RETURN 'numeric';
+      WHEN v_type IN ('real') THEN RETURN 'real';
 
       -- text types
       --
-      WHEN v_type IN ('TINYTEXT', 'TEXT', 'MEDIUMTEXT', 'LONGTEXT', 'ENUM', 'SET') THEN RETURN 'text';
-      WHEN v_type IN ('CHAR') THEN RETURN 'char';
-      WHEN v_type IN ('VARCHAR') THEN RETURN 'varchar';
+      WHEN v_type IN ('tinytext', 'text', 'mediumtext', 'longtext', 'enum', 'set') THEN RETURN 'text';
+      WHEN v_type IN ('char') THEN RETURN format('char(%s)', v_length);
+      WHEN v_type IN ('varchar') THEN RETURN format('varchar(%s)', v_length);
 
       -- date types
       --
-      WHEN v_type IN ('DATETIME', 'TIMESTAMP') THEN RETURN 'timestamp without time zone';
-      WHEN v_type IN ('TIME') THEN RETURN 'time without time zone';
-      WHEN v_type IN ('DATE') THEN RETURN 'date';
+      WHEN v_type IN ('datetime', 'timestamp') THEN RETURN 'timestamp without time zone';
+      WHEN v_type IN ('time') THEN RETURN 'time without time zone';
+      WHEN v_type IN ('date') THEN RETURN 'date';
 
       -- binary types
-      WHEN v_type IN ('VARBINARY', 'BINARY', 'TINYBLOB', 'BLOB', 'MEDIUMBLOB', 'LONGBLOB') THEN RETURN 'bytea';
-      WHEN v_type IN ('BIT') THEN RETURN 'bit varying';
+      WHEN v_type IN ('varbinary', 'binary', 'tinyblob', 'blob', 'mediumblob', 'longblob') THEN RETURN 'bytea';
+      WHEN v_type IN ('bit') THEN RETURN 'bit varying';
 
       -- other types
-      WHEN v_type IN ('BOOLEAN', 'BOOL') THEN RETURN 'boolean';
-      WHEN v_type IN ('MULTIPOLYGON') THEN RETURN v_geom_type;
+      WHEN v_type IN ('boolean', 'bool') THEN RETURN 'boolean';
+      WHEN v_type IN ('geometry', 'multipolygon') THEN RETURN v_geom_type;
 
       -- cannot translate
       ELSE RETURN 'text'; 

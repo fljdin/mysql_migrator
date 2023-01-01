@@ -1,7 +1,7 @@
 include docker/docker.mk
 EXTENSION = mysql_migrator
 DATA = mysql_migrator--*.sql
-REGRESS = migrate check_results
+REGRESS = migrate check_results migrate_finish
 
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)

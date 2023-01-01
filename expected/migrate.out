@@ -20,13 +20,91 @@ GRANT USAGE ON FOREIGN SERVER mysql TO migrator;
 \connect - migrator
 SET client_min_messages = WARNING;
 /* set up staging schemas */
-CREATE SCHEMA IF NOT EXISTS fdw_stage;
-SELECT mysql_create_catalog(
-    server => 'mysql',
-    schema => 'fdw_stage'
+SELECT db_migrate_prepare(
+   plugin => 'mysql_migrator',
+   server => 'mysql'
 );
- mysql_create_catalog 
+ db_migrate_prepare 
+--------------------
+                  0
+(1 row)
+
+/* perform the data migration */
+SELECT db_migrate_mkforeign(
+   plugin => 'mysql_migrator',
+   server => 'mysql'
+);
+ db_migrate_mkforeign 
 ----------------------
- 
+                    0
+(1 row)
+
+/* migrate the rest of the database */
+SELECT db_migrate_tables(
+   plugin => 'mysql_migrator'
+);
+ db_migrate_tables 
+-------------------
+                 0
+(1 row)
+
+SELECT db_migrate_constraints(
+   plugin => 'mysql_migrator'
+);
+WARNING:  Error creating primary key or unique constraint on table sakila.film_actor
+DETAIL:  could not create unique index "film_actor_actor_id_pkey": Key (actor_id)=(1) is duplicated.
+WARNING:  Error creating primary key or unique constraint on table sakila.film_actor
+DETAIL:  could not create unique index "film_actor_film_id_pkey": Key (film_id)=(515) is duplicated.
+WARNING:  Error creating primary key or unique constraint on table sakila.film_category
+DETAIL:  could not create unique index "film_category_category_id_pkey": Key (category_id)=(6) is duplicated.
+WARNING:  Error creating foreign key constraint on table sakila.payment
+DETAIL:  insert or update on table "payment" violates foreign key constraint "fk_payment_staff": Key (staff_id)=(1) is not present in table "staff".
+WARNING:  Error creating foreign key constraint on table sakila.rental
+DETAIL:  insert or update on table "rental" violates foreign key constraint "fk_rental_staff": Key (staff_id)=(1) is not present in table "staff".
+WARNING:  Error creating foreign key constraint on table sakila.store
+DETAIL:  insert or update on table "store" violates foreign key constraint "fk_store_staff": Key (manager_staff_id)=(1) is not present in table "staff".
+WARNING:  Error setting default value on rating of table sakila.film to "G"
+DETAIL:  cannot use column reference in DEFAULT expression: 
+ db_migrate_constraints 
+------------------------
+                      7
+(1 row)
+
+SELECT db_migrate_functions(
+   plugin => 'mysql_migrator'
+);
+ db_migrate_functions 
+----------------------
+                    0
+(1 row)
+
+SELECT db_migrate_triggers(
+   plugin => 'mysql_migrator'
+);
+ db_migrate_triggers 
+---------------------
+                   0
+(1 row)
+
+SELECT db_migrate_views(
+   plugin => 'mysql_migrator'
+);
+WARNING:  Error creating view sakila.actor_info
+DETAIL:  syntax error at or near ".": 
+WARNING:  Error creating view sakila.customer_list
+DETAIL:  syntax error at or near ".": 
+WARNING:  Error creating view sakila.film_list
+DETAIL:  syntax error at or near ".": 
+WARNING:  Error creating view sakila.nicer_but_slower_film_list
+DETAIL:  syntax error at or near ".": 
+WARNING:  Error creating view sakila.sales_by_film_category
+DETAIL:  syntax error at or near ".": 
+WARNING:  Error creating view sakila.sales_by_store
+DETAIL:  syntax error at or near ".": 
+WARNING:  Error creating view sakila.staff_list
+DETAIL:  syntax error at or near ".": 
+ db_migrate_views 
+------------------
+                7
 (1 row)
 

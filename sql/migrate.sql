@@ -28,8 +28,34 @@ GRANT USAGE ON FOREIGN SERVER mysql TO migrator;
 SET client_min_messages = WARNING;
 
 /* set up staging schemas */
-CREATE SCHEMA IF NOT EXISTS fdw_stage;
-SELECT mysql_create_catalog(
-    server => 'mysql',
-    schema => 'fdw_stage'
+SELECT db_migrate_prepare(
+   plugin => 'mysql_migrator',
+   server => 'mysql'
+);
+
+/* perform the data migration */
+SELECT db_migrate_mkforeign(
+   plugin => 'mysql_migrator',
+   server => 'mysql'
+);
+
+/* migrate the rest of the database */
+SELECT db_migrate_tables(
+   plugin => 'mysql_migrator'
+);
+
+SELECT db_migrate_constraints(
+   plugin => 'mysql_migrator'
+);
+
+SELECT db_migrate_functions(
+   plugin => 'mysql_migrator'
+);
+
+SELECT db_migrate_triggers(
+   plugin => 'mysql_migrator'
+);
+
+SELECT db_migrate_views(
+   plugin => 'mysql_migrator'
 );

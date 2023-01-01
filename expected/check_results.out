@@ -1,11 +1,13 @@
 SET client_min_messages = WARNING;
 \dn
-        List of schemas
-   Name    |       Owner       
------------+-------------------
- fdw_stage | migrator
- public    | pg_database_owner
-(2 rows)
+         List of schemas
+    Name     |       Owner       
+-------------+-------------------
+ fdw_stage   | migrator
+ pgsql_stage | migrator
+ public      | pg_database_owner
+ sakila      | migrator
+(4 rows)
 
 \d fdw_stage.*
                         Foreign table "fdw_stage.CHECK_CONSTRAINTS"
