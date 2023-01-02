@@ -85,7 +85,7 @@ DECLARE
       CREATE OR REPLACE VIEW %1$I.keys AS
          SELECT "CONSTRAINT_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
             (CASE WHEN "CONSTRAINT_NAME" = 'PRIMARY'
-               THEN concat_ws('_', "TABLE_NAME", "COLUMN_NAME", 'pkey')
+               THEN concat_ws('_', "TABLE_NAME", 'pkey')
                ELSE "CONSTRAINT_NAME"
             END)::character varying(64) AS constraint_name, false AS "deferrable", false AS deferred,
             "COLUMN_NAME" AS column_name, "ORDINAL_POSITION" AS position, 

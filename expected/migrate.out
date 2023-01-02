@@ -29,6 +29,13 @@ SELECT db_migrate_prepare(
                   0
 (1 row)
 
+/* exclude bytea columns from migration */
+DELETE FROM pgsql_stage.columns WHERE type_name = 'bytea';
+/* quote character expression */
+UPDATE pgsql_stage.columns SET default_value = $$'G'$$
+   WHERE default_value = 'G';
+/* disable view migration */
+UPDATE pgsql_stage.views SET migrate = false;
 /* perform the data migration */
 SELECT db_migrate_mkforeign(
    plugin => 'mysql_migrator',
@@ -51,23 +58,16 @@ SELECT db_migrate_tables(
 SELECT db_migrate_constraints(
    plugin => 'mysql_migrator'
 );
-WARNING:  Error creating primary key or unique constraint on table sakila.film_actor
-DETAIL:  could not create unique index "film_actor_actor_id_pkey": Key (actor_id)=(1) is duplicated.
-WARNING:  Error creating primary key or unique constraint on table sakila.film_actor
-DETAIL:  could not create unique index "film_actor_film_id_pkey": Key (film_id)=(515) is duplicated.
-WARNING:  Error creating primary key or unique constraint on table sakila.film_category
-DETAIL:  could not create unique index "film_category_category_id_pkey": Key (category_id)=(6) is duplicated.
-WARNING:  Error creating foreign key constraint on table sakila.payment
-DETAIL:  insert or update on table "payment" violates foreign key constraint "fk_payment_staff": Key (staff_id)=(1) is not present in table "staff".
-WARNING:  Error creating foreign key constraint on table sakila.rental
-DETAIL:  insert or update on table "rental" violates foreign key constraint "fk_rental_staff": Key (staff_id)=(1) is not present in table "staff".
-WARNING:  Error creating foreign key constraint on table sakila.store
-DETAIL:  insert or update on table "store" violates foreign key constraint "fk_store_staff": Key (manager_staff_id)=(1) is not present in table "staff".
-WARNING:  Error setting default value on rating of table sakila.film to "G"
-DETAIL:  cannot use column reference in DEFAULT expression: 
  db_migrate_constraints 
 ------------------------
-                      7
+                      0
+(1 row)
+
+/* attach sequences to table columns as identity */
+SELECT mysql_migrate_identity();
+ mysql_migrate_identity 
+------------------------
+                      0
 (1 row)
 
 SELECT db_migrate_functions(
@@ -89,22 +89,8 @@ SELECT db_migrate_triggers(
 SELECT db_migrate_views(
    plugin => 'mysql_migrator'
 );
-WARNING:  Error creating view sakila.actor_info
-DETAIL:  syntax error at or near ".": 
-WARNING:  Error creating view sakila.customer_list
-DETAIL:  syntax error at or near ".": 
-WARNING:  Error creating view sakila.film_list
-DETAIL:  syntax error at or near ".": 
-WARNING:  Error creating view sakila.nicer_but_slower_film_list
-DETAIL:  syntax error at or near ".": 
-WARNING:  Error creating view sakila.sales_by_film_category
-DETAIL:  syntax error at or near ".": 
-WARNING:  Error creating view sakila.sales_by_store
-DETAIL:  syntax error at or near ".": 
-WARNING:  Error creating view sakila.staff_list
-DETAIL:  syntax error at or near ".": 
  db_migrate_views 
 ------------------
-                7
+                0
 (1 row)
 

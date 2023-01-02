@@ -663,30 +663,30 @@ SELECT * FROM fdw_stage.foreign_keys ORDER BY schema, table_name, constraint_nam
 (22 rows)
 
 SELECT * FROM fdw_stage.keys ORDER BY schema, table_name, constraint_name, position;
- schema |  table_name   |        constraint_name         | deferrable | deferred |   column_name    | position | is_primary 
---------+---------------+--------------------------------+------------+----------+------------------+----------+------------
- sakila | actor         | actor_actor_id_pkey            | f          | f        | actor_id         |        1 | t
- sakila | address       | address_address_id_pkey        | f          | f        | address_id       |        1 | t
- sakila | category      | category_category_id_pkey      | f          | f        | category_id      |        1 | t
- sakila | city          | city_city_id_pkey              | f          | f        | city_id          |        1 | t
- sakila | country       | country_country_id_pkey        | f          | f        | country_id       |        1 | t
- sakila | customer      | customer_customer_id_pkey      | f          | f        | customer_id      |        1 | t
- sakila | film          | film_film_id_pkey              | f          | f        | film_id          |        1 | t
- sakila | film_actor    | film_actor_actor_id_pkey       | f          | f        | actor_id         |        1 | t
- sakila | film_actor    | film_actor_film_id_pkey        | f          | f        | film_id          |        2 | t
- sakila | film_category | film_category_category_id_pkey | f          | f        | category_id      |        2 | t
- sakila | film_category | film_category_film_id_pkey     | f          | f        | film_id          |        1 | t
- sakila | film_text     | film_text_film_id_pkey         | f          | f        | film_id          |        1 | t
- sakila | inventory     | inventory_inventory_id_pkey    | f          | f        | inventory_id     |        1 | t
- sakila | language      | language_language_id_pkey      | f          | f        | language_id      |        1 | t
- sakila | payment       | payment_payment_id_pkey        | f          | f        | payment_id       |        1 | t
- sakila | rental        | rental_date                    | f          | f        | rental_date      |        1 | f
- sakila | rental        | rental_date                    | f          | f        | inventory_id     |        2 | f
- sakila | rental        | rental_date                    | f          | f        | customer_id      |        3 | f
- sakila | rental        | rental_rental_id_pkey          | f          | f        | rental_id        |        1 | t
- sakila | staff         | staff_staff_id_pkey            | f          | f        | staff_id         |        1 | t
- sakila | store         | idx_unique_manager             | f          | f        | manager_staff_id |        1 | f
- sakila | store         | store_store_id_pkey            | f          | f        | store_id         |        1 | t
+ schema |  table_name   |  constraint_name   | deferrable | deferred |   column_name    | position | is_primary 
+--------+---------------+--------------------+------------+----------+------------------+----------+------------
+ sakila | actor         | actor_pkey         | f          | f        | actor_id         |        1 | t
+ sakila | address       | address_pkey       | f          | f        | address_id       |        1 | t
+ sakila | category      | category_pkey      | f          | f        | category_id      |        1 | t
+ sakila | city          | city_pkey          | f          | f        | city_id          |        1 | t
+ sakila | country       | country_pkey       | f          | f        | country_id       |        1 | t
+ sakila | customer      | customer_pkey      | f          | f        | customer_id      |        1 | t
+ sakila | film          | film_pkey          | f          | f        | film_id          |        1 | t
+ sakila | film_actor    | film_actor_pkey    | f          | f        | actor_id         |        1 | t
+ sakila | film_actor    | film_actor_pkey    | f          | f        | film_id          |        2 | t
+ sakila | film_category | film_category_pkey | f          | f        | film_id          |        1 | t
+ sakila | film_category | film_category_pkey | f          | f        | category_id      |        2 | t
+ sakila | film_text     | film_text_pkey     | f          | f        | film_id          |        1 | t
+ sakila | inventory     | inventory_pkey     | f          | f        | inventory_id     |        1 | t
+ sakila | language      | language_pkey      | f          | f        | language_id      |        1 | t
+ sakila | payment       | payment_pkey       | f          | f        | payment_id       |        1 | t
+ sakila | rental        | rental_date        | f          | f        | rental_date      |        1 | f
+ sakila | rental        | rental_date        | f          | f        | inventory_id     |        2 | f
+ sakila | rental        | rental_date        | f          | f        | customer_id      |        3 | f
+ sakila | rental        | rental_pkey        | f          | f        | rental_id        |        1 | t
+ sakila | staff         | staff_pkey         | f          | f        | staff_id         |        1 | t
+ sakila | store         | idx_unique_manager | f          | f        | manager_staff_id |        1 | f
+ sakila | store         | store_pkey         | f          | f        | store_id         |        1 | t
 (22 rows)
 
 SELECT * FROM fdw_stage.views ORDER BY schema, view_name;

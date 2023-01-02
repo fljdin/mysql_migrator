@@ -33,6 +33,16 @@ SELECT db_migrate_prepare(
    server => 'mysql'
 );
 
+/* exclude bytea columns from migration */
+DELETE FROM pgsql_stage.columns WHERE type_name = 'bytea';
+
+/* quote character expression */
+UPDATE pgsql_stage.columns SET default_value = $$'G'$$
+   WHERE default_value = 'G';
+
+/* disable view migration */
+UPDATE pgsql_stage.views SET migrate = false;
+
 /* perform the data migration */
 SELECT db_migrate_mkforeign(
    plugin => 'mysql_migrator',
