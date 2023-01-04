@@ -58,6 +58,9 @@ SELECT db_migrate_constraints(
    plugin => 'mysql_migrator'
 );
 
+/* attach sequences to table columns as identity */
+SELECT mysql_migrate_identity();
+
 SELECT db_migrate_functions(
    plugin => 'mysql_migrator'
 );
