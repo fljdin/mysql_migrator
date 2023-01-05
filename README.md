@@ -31,12 +31,12 @@ See the `db_migrator` documentation for details.
 
 ### function `mysql_migrate_identity`
 
-This function must be executed after `db_migrate_mkforeign()`, as it replaces
-pre-existent sequences. 
-
 Its read `tables`, `columns`, `keys` and `sequences` staging tables to correctly
 map primary key columns with MySQL's `AUTO_INCREMENT` attribute, in order to
 define identity specifications per column.
+
+This function must be executed **before** `db_migrate_finish()`, as it replaces
+pre-existent sequences based on data in staging schema.
 
 The function parameters are:
 
