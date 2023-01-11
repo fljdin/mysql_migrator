@@ -142,7 +142,32 @@ DECLARE
             "CHECK_CLAUSE" AS condition
          FROM %1$I."TABLE_CONSTRAINTS" cons
          JOIN %1$I."CHECK_CONSTRAINTS" cond USING ("CONSTRAINT_SCHEMA", "CONSTRAINT_NAME")
-         WHERE "CONSTRAINT_SCHEMA" NOT IN (%2$s);
+         WHERE "CONSTRAINT_SCHEMA" NOT IN (%2$s)
+         --
+         -- replace ENUM type by check constraints
+         --
+         UNION
+         SELECT "TABLE_SCHEMA", "TABLE_NAME", 
+            concat_ws('_', "TABLE_NAME", "COLUMN_NAME", 'enum_chk')::character varying(64),
+            false, false, format('(%%I IN %%s)', "COLUMN_NAME", substr("COLUMN_TYPE", 5))
+         FROM %1$I."COLUMNS" 
+         JOIN %1$I."TABLES" USING ("TABLE_SCHEMA", "TABLE_NAME")
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s) 
+         AND "TABLE_TYPE" = 'BASE TABLE' AND "DATA_TYPE" = 'enum'
+         --
+         -- replace SET type by check constraints
+         --
+         UNION 
+         SELECT "TABLE_SCHEMA", "TABLE_NAME", 
+            concat_ws('_', "TABLE_NAME", "COLUMN_NAME", 'set_chk')::character varying(64),
+            false, false, format(
+               '(string_to_array(%%I, '','') <@ ARRAY[%%s])',
+               "COLUMN_NAME", regexp_replace("COLUMN_TYPE", '^set\(([^)]*)\)$', '\1')
+            )
+         FROM %1$I."COLUMNS" 
+         JOIN %1$I."TABLES" USING ("TABLE_SCHEMA", "TABLE_NAME")
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s) 
+         AND "TABLE_TYPE" = 'BASE TABLE' AND "DATA_TYPE" = 'set';
       COMMENT ON VIEW %1$I.checks IS 'MySQL check constraints on foreign server "%3$I"';
    $$;
 

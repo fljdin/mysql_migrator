@@ -631,9 +631,11 @@ SELECT * FROM fdw_stage.columns ORDER BY schema, table_name, position;
 (132 rows)
 
 SELECT * FROM fdw_stage.checks ORDER BY schema, table_name, constraint_name;
- schema | table_name | constraint_name | deferrable | deferred | condition 
---------+------------+-----------------+------------+----------+-----------
-(0 rows)
+ schema | table_name |        constraint_name        | deferrable | deferred |                                                     condition                                                     
+--------+------------+-------------------------------+------------+----------+-------------------------------------------------------------------------------------------------------------------
+ sakila | film       | film_rating_enum_chk          | f          | f        | (rating IN ('G','PG','PG-13','R','NC-17'))
+ sakila | film       | film_special_features_set_chk | f          | f        | (string_to_array(special_features, ',') <@ ARRAY['Trailers','Commentaries','Deleted Scenes','Behind the Scenes'])
+(2 rows)
 
 SELECT * FROM fdw_stage.foreign_keys ORDER BY schema, table_name, constraint_name, position;
  schema |  table_name   |      constraint_name      | deferrable | deferred | delete_rule |     column_name      | position | remote_schema | remote_table | remote_column 
