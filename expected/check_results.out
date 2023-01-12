@@ -359,14 +359,6 @@ FDW options: (dbname 'mysql', table_name 'innodb_index_stats')
  task_unit       | text                  |           |          | 
  migration_hours | integer               |           |          | 
 
-                       View "fdw_stage.packages"
-    Column    |         Type          | Collation | Nullable | Default 
---------------+-----------------------+-----------+----------+---------
- schema       | character varying(64) |           |          | 
- package_name | character varying(64) |           |          | 
- is_body      | boolean               |           |          | 
- source       | text                  |           |          | 
-
                     View "fdw_stage.schemas"
  Column |         Type          | Collation | Nullable | Default 
 --------+-----------------------+-----------+----------+---------
@@ -970,11 +962,6 @@ SELECT * FROM fdw_stage.triggers ORDER BY schema, table_name, trigger_name;
  sakila | payment    | payment_date         | BEFORE       | INSERT           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | SET NEW.payment_date = NOW()
  sakila | rental     | rental_date          | BEFORE       | INSERT           | t            |             | REFERENCING NEW AS NEW OLD AS OLD | SET NEW.rental_date = NOW()
 (6 rows)
-
-SELECT * FROM fdw_stage.packages;
- schema | package_name | is_body | source 
---------+--------------+---------+--------
-(0 rows)
 
 SELECT * FROM fdw_stage.table_privs ORDER BY schema, table_name, privilege;
  schema | table_name | privilege | grantor | grantee | grantable 

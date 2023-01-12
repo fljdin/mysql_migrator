@@ -16,7 +16,6 @@ SELECT * FROM fdw_stage.sequences ORDER BY schema, sequence_name;
 SELECT * FROM fdw_stage.index_columns ORDER BY schema, table_name, index_name, position;
 SELECT * FROM fdw_stage.indexes ORDER BY schema, table_name, index_name;
 SELECT * FROM fdw_stage.triggers ORDER BY schema, table_name, trigger_name;
-SELECT * FROM fdw_stage.packages;
 SELECT * FROM fdw_stage.table_privs ORDER BY schema, table_name, privilege;
 SELECT * FROM fdw_stage.column_privs ORDER BY schema, table_name, privilege;
 SELECT * FROM fdw_stage.segments ORDER BY schema, segment_name, segment_type;

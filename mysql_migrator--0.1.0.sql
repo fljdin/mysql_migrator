@@ -327,15 +327,6 @@ DECLARE
       COMMENT ON VIEW %1$I.triggers IS 'MySQL triggers on foreign server "%3$I"';
    $$;
 
-   /* packages -- not available */
-   packages_sql text := $$
-      CREATE OR REPLACE VIEW %1$I.packages AS
-         SELECT null::varchar(64) AS schema, null::varchar(64) AS package_name,
-            false AS is_body, null AS source
-         WHERE 1 = 0;
-      COMMENT ON VIEW %1$I.packages IS 'MySQL does not have packages';
-   $$;
-
    /* table_privs */
    table_privs_sql text := $$
       CREATE OR REPLACE VIEW %1$I.table_privs AS
@@ -482,7 +473,6 @@ BEGIN
    EXECUTE format(index_columns_sql, schema, sys_schemas, server);
    EXECUTE format(indexes_sql, schema, sys_schemas, server);
    EXECUTE format(triggers_sql, schema, sys_schemas, server);
-   EXECUTE format(packages_sql, schema);
    EXECUTE format(table_privs_sql, schema, sys_schemas, server);
    EXECUTE format(column_privs_sql, schema, sys_schemas, server);
    EXECUTE format(segments_sql, schema, sys_schemas, server);
