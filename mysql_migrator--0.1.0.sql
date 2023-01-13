@@ -97,7 +97,7 @@ DECLARE
    catalog_tables varchar(64)[] := ARRAY[
       'SCHEMATA', 'TABLES', 'COLUMNS', 'TABLE_CONSTRAINTS', 'CHECK_CONSTRAINTS',
       'KEY_COLUMN_USAGE', 'REFERENTIAL_CONSTRAINTS', 'VIEWS', 'PARAMETERS',
-      'STATISTICS', 'TABLE_PRIVILEGES', 'COLUMN_PRIVILEGES'
+      'STATISTICS', 'TABLE_PRIVILEGES', 'COLUMN_PRIVILEGES', 'PARTITIONS'
    ];
    sys_schemas text := $$ 'information_schema', 'mysql', 'performance_schema', 'sys' $$;
 
@@ -302,6 +302,40 @@ DECLARE
       COMMENT ON VIEW %1$I.indexes IS 'MySQL indexes on foreign server "%3$I"';
    $$;
 
+   /* partitions */
+   partitions_sql text := $$
+      CREATE OR REPLACE VIEW %1$I.partitions AS
+         SELECT DISTINCT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
+            "PARTITION_NAME" AS partition_name, "PARTITION_METHOD" AS type,
+            trim('`' FROM "PARTITION_EXPRESSION") AS expression, 
+            "PARTITION_ORDINAL_POSITION" AS position,
+            "PARTITION_DESCRIPTION" AS values,
+            CASE WHEN ("PARTITION_METHOD" = 'LIST' AND "PARTITION_DESCRIPTION" IS NULL)
+               THEN true ELSE false END AS is_default
+         FROM %1$I."PARTITIONS"
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s)
+         AND "PARTITION_NAME" IS NOT NULL;
+      COMMENT ON VIEW %1$I.partitions IS 'MySQL partitions on foreign server "%3$I"';
+   $$;
+
+   /* subpartitions */
+   subpartitions_sql text := $$
+      CREATE OR REPLACE VIEW %1$I.subpartitions AS
+         SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
+            "PARTITION_NAME" AS partition_name, "SUBPARTITION_NAME" AS subpartition_name, 
+            "SUBPARTITION_METHOD" AS type, 
+            trim('`' FROM "SUBPARTITION_EXPRESSION") AS expression,
+            "SUBPARTITION_ORDINAL_POSITION" AS position,
+            null AS values, -- MySQL only supports HASH subpartition method
+            CASE WHEN ("PARTITION_METHOD" = 'LIST' AND "PARTITION_DESCRIPTION" IS NULL)
+               THEN true ELSE false END AS is_default
+         FROM %1$I."PARTITIONS"
+         WHERE "TABLE_SCHEMA" NOT IN (%2$s)
+         AND "PARTITION_NAME" IS NOT NULL
+         AND "SUBPARTITION_NAME" IS NOT NULL;
+      COMMENT ON VIEW %1$I.partitions IS 'MySQL subpartitions on foreign server "%3$I"';
+   $$;
+
    /* triggers */   
    triggers_sql text := $$
       DROP FOREIGN TABLE IF EXISTS %1$I."TRIGGERS" CASCADE;
@@ -472,6 +506,8 @@ BEGIN
    EXECUTE format(sequences_sql, schema, sys_schemas, server);
    EXECUTE format(index_columns_sql, schema, sys_schemas, server);
    EXECUTE format(indexes_sql, schema, sys_schemas, server);
+   EXECUTE format(partitions_sql, schema, sys_schemas, server);
+   EXECUTE format(subpartitions_sql, schema, sys_schemas, server);
    EXECUTE format(triggers_sql, schema, sys_schemas, server);
    EXECUTE format(table_privs_sql, schema, sys_schemas, server);
    EXECUTE format(column_privs_sql, schema, sys_schemas, server);
@@ -613,6 +649,10 @@ CREATE FUNCTION mysql_translate_expression(s text) RETURNS text
    LANGUAGE plpgsql IMMUTABLE STRICT SET search_path FROM CURRENT AS
 $mysql_translate_expression$
 BEGIN
+   s := regexp_replace(s, '^unix_timestamp\(`([^`]*)`\)$', 'EXTRACT(epoch FROM \1)', 'i');
+   s := regexp_replace(s, '^year\(`([^`]*)`\)$', 'EXTRACT(year FROM \1)', 'i');
+   s := regexp_replace(s, '^to_days\(`([^`]*)`\)$', 'EXTRACT(day FROM \1)', 'i');
+
    RETURN s;
 END;
 $mysql_translate_expression$;

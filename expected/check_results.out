@@ -101,6 +101,37 @@ FDW options: (dbname 'information_schema', table_name 'KEY_COLUMN_USAGE')
 Server: mysql
 FDW options: (dbname 'information_schema', table_name 'PARAMETERS')
 
+                                    Foreign table "fdw_stage.PARTITIONS"
+            Column             |            Type             | Collation | Nullable | Default | FDW options 
+-------------------------------+-----------------------------+-----------+----------+---------+-------------
+ TABLE_CATALOG                 | character varying(64)       |           | not null |         | 
+ TABLE_SCHEMA                  | character varying(64)       |           | not null |         | 
+ TABLE_NAME                    | character varying(64)       |           | not null |         | 
+ PARTITION_NAME                | character varying(64)       |           |          |         | 
+ SUBPARTITION_NAME             | character varying(64)       |           |          |         | 
+ PARTITION_ORDINAL_POSITION    | integer                     |           |          |         | 
+ SUBPARTITION_ORDINAL_POSITION | integer                     |           |          |         | 
+ PARTITION_METHOD              | character varying(13)       |           |          |         | 
+ SUBPARTITION_METHOD           | character varying(13)       |           |          |         | 
+ PARTITION_EXPRESSION          | character varying(2048)     |           |          |         | 
+ SUBPARTITION_EXPRESSION       | character varying(2048)     |           |          |         | 
+ PARTITION_DESCRIPTION         | text                        |           |          |         | 
+ TABLE_ROWS                    | bigint                      |           |          |         | 
+ AVG_ROW_LENGTH                | bigint                      |           |          |         | 
+ DATA_LENGTH                   | bigint                      |           |          |         | 
+ MAX_DATA_LENGTH               | bigint                      |           |          |         | 
+ INDEX_LENGTH                  | bigint                      |           |          |         | 
+ DATA_FREE                     | bigint                      |           |          |         | 
+ CREATE_TIME                   | timestamp without time zone |           | not null |         | 
+ UPDATE_TIME                   | timestamp without time zone |           |          |         | 
+ CHECK_TIME                    | timestamp without time zone |           |          |         | 
+ CHECKSUM                      | bigint                      |           |          |         | 
+ PARTITION_COMMENT             | text                        |           | not null |         | 
+ NODEGROUP                     | character varying(256)      |           |          |         | 
+ TABLESPACE_NAME               | character varying(268)      |           |          |         | 
+Server: mysql
+FDW options: (dbname 'information_schema', table_name 'PARTITIONS')
+
                         Foreign table "fdw_stage.REFERENTIAL_CONSTRAINTS"
           Column           |         Type          | Collation | Nullable | Default | FDW options 
 ---------------------------+-----------------------+-----------+----------+---------+-------------
@@ -359,6 +390,18 @@ FDW options: (dbname 'mysql', table_name 'innodb_index_stats')
  task_unit       | text                  |           |          | 
  migration_hours | integer               |           |          | 
 
+                       View "fdw_stage.partitions"
+     Column     |         Type          | Collation | Nullable | Default 
+----------------+-----------------------+-----------+----------+---------
+ schema         | character varying(64) |           |          | 
+ table_name     | character varying(64) |           |          | 
+ partition_name | character varying(64) |           |          | 
+ type           | character varying(13) |           |          | 
+ expression     | text                  |           |          | 
+ position       | integer               |           |          | 
+ values         | text                  |           |          | 
+ is_default     | boolean               |           |          | 
+
                     View "fdw_stage.schemas"
  Column |         Type          | Collation | Nullable | Default 
 --------+-----------------------+-----------+----------+---------
@@ -383,6 +426,19 @@ FDW options: (dbname 'mysql', table_name 'innodb_index_stats')
  cyclical      | boolean               |           |          | 
  cache_size    | integer               |           |          | 
  last_value    | bigint                |           |          | 
+
+                       View "fdw_stage.subpartitions"
+      Column       |         Type          | Collation | Nullable | Default 
+-------------------+-----------------------+-----------+----------+---------
+ schema            | character varying(64) |           |          | 
+ table_name        | character varying(64) |           |          | 
+ partition_name    | character varying(64) |           |          | 
+ subpartition_name | character varying(64) |           |          | 
+ type              | character varying(13) |           |          | 
+ expression        | text                  |           |          | 
+ position          | integer               |           |          | 
+ values            | text                  |           |          | 
+ is_default        | boolean               |           |          | 
 
                      View "fdw_stage.table_privs"
    Column   |          Type          | Collation | Nullable | Default 
@@ -459,168 +515,212 @@ primary key, btree, for table "fdw_stage.test_error_stats"
  definition | text                  |           |          | 
 
 SELECT * FROM fdw_stage.schemas ORDER BY schema;
- schema 
---------
+   schema   
+------------
+ partitions
  sakila
-(1 row)
+(2 rows)
 
 SELECT * FROM fdw_stage.tables ORDER BY schema, table_name;
- schema |  table_name   
---------+---------------
- sakila | actor
- sakila | address
- sakila | category
- sakila | city
- sakila | country
- sakila | customer
- sakila | film
- sakila | film_actor
- sakila | film_category
- sakila | film_text
- sakila | inventory
- sakila | language
- sakila | payment
- sakila | rental
- sakila | staff
- sakila | store
-(16 rows)
+   schema   |       table_name        
+------------+-------------------------
+ partitions | employees
+ partitions | employees_by_date_range
+ partitions | employees_by_hash
+ partitions | employees_by_int_range
+ partitions | employees_by_list
+ partitions | subpart_by_range_hash
+ sakila     | actor
+ sakila     | address
+ sakila     | category
+ sakila     | city
+ sakila     | country
+ sakila     | customer
+ sakila     | film
+ sakila     | film_actor
+ sakila     | film_category
+ sakila     | film_text
+ sakila     | inventory
+ sakila     | language
+ sakila     | payment
+ sakila     | rental
+ sakila     | staff
+ sakila     | store
+(22 rows)
 
 SELECT * FROM fdw_stage.columns ORDER BY schema, table_name, position;
- schema |         table_name         |     column_name      | position | type_name | length | precision | scale | nullable |   default_value   
---------+----------------------------+----------------------+----------+-----------+--------+-----------+-------+----------+-------------------
- sakila | actor                      | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | actor                      | first_name           |        2 | varchar   |     45 |           |       | f        | 
- sakila | actor                      | last_name            |        3 | varchar   |     45 |           |       | f        | 
- sakila | actor                      | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | actor_info                 | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 0
- sakila | actor_info                 | first_name           |        2 | varchar   |     45 |           |       | f        | 
- sakila | actor_info                 | last_name            |        3 | varchar   |     45 |           |       | f        | 
- sakila | actor_info                 | film_info            |        4 | text      |  65535 |           |       | t        | 
- sakila | address                    | address_id           |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | address                    | address              |        2 | varchar   |     50 |           |       | f        | 
- sakila | address                    | address2             |        3 | varchar   |     50 |           |       | t        | 
- sakila | address                    | district             |        4 | varchar   |     20 |           |       | f        | 
- sakila | address                    | city_id              |        5 | smallint  |        |         5 |     0 | f        | 
- sakila | address                    | postal_code          |        6 | varchar   |     10 |           |       | t        | 
- sakila | address                    | phone                |        7 | varchar   |     20 |           |       | f        | 
- sakila | address                    | location             |        8 | geometry  |        |           |       | f        | 
- sakila | address                    | last_update          |        9 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | category                   | category_id          |        1 | tinyint   |        |         3 |     0 | f        | 
- sakila | category                   | name                 |        2 | varchar   |     25 |           |       | f        | 
- sakila | category                   | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | city                       | city_id              |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | city                       | city                 |        2 | varchar   |     50 |           |       | f        | 
- sakila | city                       | country_id           |        3 | smallint  |        |         5 |     0 | f        | 
- sakila | city                       | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | country                    | country_id           |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | country                    | country              |        2 | varchar   |     50 |           |       | f        | 
- sakila | country                    | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | customer                   | customer_id          |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | customer                   | store_id             |        2 | tinyint   |        |         3 |     0 | f        | 
- sakila | customer                   | first_name           |        3 | varchar   |     45 |           |       | f        | 
- sakila | customer                   | last_name            |        4 | varchar   |     45 |           |       | f        | 
- sakila | customer                   | email                |        5 | varchar   |     50 |           |       | t        | 
- sakila | customer                   | address_id           |        6 | smallint  |        |         5 |     0 | f        | 
- sakila | customer                   | active               |        7 | tinyint   |        |         3 |     0 | f        | 1
- sakila | customer                   | create_date          |        8 | datetime  |        |         0 |       | f        | 
- sakila | customer                   | last_update          |        9 | timestamp |        |         0 |       | t        | CURRENT_TIMESTAMP
- sakila | customer_list              | ID                   |        1 | smallint  |        |         5 |     0 | f        | 0
- sakila | customer_list              | name                 |        2 | varchar   |     91 |           |       | t        | 
- sakila | customer_list              | address              |        3 | varchar   |     50 |           |       | f        | 
- sakila | customer_list              | zip code             |        4 | varchar   |     10 |           |       | t        | 
- sakila | customer_list              | phone                |        5 | varchar   |     20 |           |       | f        | 
- sakila | customer_list              | city                 |        6 | varchar   |     50 |           |       | f        | 
- sakila | customer_list              | country              |        7 | varchar   |     50 |           |       | f        | 
- sakila | customer_list              | notes                |        8 | varchar   |      6 |           |       | f        | 
- sakila | customer_list              | SID                  |        9 | tinyint   |        |         3 |     0 | f        | 
- sakila | film                       | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | film                       | title                |        2 | varchar   |    128 |           |       | f        | 
- sakila | film                       | description          |        3 | text      |  65535 |           |       | t        | 
- sakila | film                       | release_year         |        4 | year      |        |           |       | t        | 
- sakila | film                       | language_id          |        5 | tinyint   |        |         3 |     0 | f        | 
- sakila | film                       | original_language_id |        6 | tinyint   |        |         3 |     0 | t        | 
- sakila | film                       | rental_duration      |        7 | tinyint   |        |         3 |     0 | f        | 3
- sakila | film                       | rental_rate          |        8 | decimal   |        |         4 |     2 | f        | 4.99
- sakila | film                       | length               |        9 | smallint  |        |         5 |     0 | t        | 
- sakila | film                       | replacement_cost     |       10 | decimal   |        |         5 |     2 | f        | 19.99
- sakila | film                       | rating               |       11 | enum      |      5 |           |       | t        | G
- sakila | film                       | special_features     |       12 | set       |     54 |           |       | t        | 
- sakila | film                       | last_update          |       13 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | film_actor                 | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | film_actor                 | film_id              |        2 | smallint  |        |         5 |     0 | f        | 
- sakila | film_actor                 | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | film_category              | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | film_category              | category_id          |        2 | tinyint   |        |         3 |     0 | f        | 
- sakila | film_category              | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | film_list                  | FID                  |        1 | smallint  |        |         5 |     0 | t        | 0
- sakila | film_list                  | title                |        2 | varchar   |    128 |           |       | t        | 
- sakila | film_list                  | description          |        3 | text      |  65535 |           |       | t        | 
- sakila | film_list                  | category             |        4 | varchar   |     25 |           |       | f        | 
- sakila | film_list                  | price                |        5 | decimal   |        |         4 |     2 | t        | 4.99
- sakila | film_list                  | length               |        6 | smallint  |        |         5 |     0 | t        | 
- sakila | film_list                  | rating               |        7 | enum      |      5 |           |       | t        | G
- sakila | film_list                  | actors               |        8 | text      |  65535 |           |       | t        | 
- sakila | film_text                  | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | film_text                  | title                |        2 | varchar   |    255 |           |       | f        | 
- sakila | film_text                  | description          |        3 | text      |  65535 |           |       | t        | 
- sakila | inventory                  | inventory_id         |        1 | mediumint |        |         7 |     0 | f        | 
- sakila | inventory                  | film_id              |        2 | smallint  |        |         5 |     0 | f        | 
- sakila | inventory                  | store_id             |        3 | tinyint   |        |         3 |     0 | f        | 
- sakila | inventory                  | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | language                   | language_id          |        1 | tinyint   |        |         3 |     0 | f        | 
- sakila | language                   | name                 |        2 | char      |     20 |           |       | f        | 
- sakila | language                   | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | nicer_but_slower_film_list | FID                  |        1 | smallint  |        |         5 |     0 | t        | 0
- sakila | nicer_but_slower_film_list | title                |        2 | varchar   |    128 |           |       | t        | 
- sakila | nicer_but_slower_film_list | description          |        3 | text      |  65535 |           |       | t        | 
- sakila | nicer_but_slower_film_list | category             |        4 | varchar   |     25 |           |       | f        | 
- sakila | nicer_but_slower_film_list | price                |        5 | decimal   |        |         4 |     2 | t        | 4.99
- sakila | nicer_but_slower_film_list | length               |        6 | smallint  |        |         5 |     0 | t        | 
- sakila | nicer_but_slower_film_list | rating               |        7 | enum      |      5 |           |       | t        | G
- sakila | nicer_but_slower_film_list | actors               |        8 | text      |  65535 |           |       | t        | 
- sakila | payment                    | payment_id           |        1 | smallint  |        |         5 |     0 | f        | 
- sakila | payment                    | customer_id          |        2 | smallint  |        |         5 |     0 | f        | 
- sakila | payment                    | staff_id             |        3 | tinyint   |        |         3 |     0 | f        | 
- sakila | payment                    | rental_id            |        4 | int       |        |        10 |     0 | t        | 
- sakila | payment                    | amount               |        5 | decimal   |        |         5 |     2 | f        | 
- sakila | payment                    | payment_date         |        6 | datetime  |        |         0 |       | f        | 
- sakila | payment                    | last_update          |        7 | timestamp |        |         0 |       | t        | CURRENT_TIMESTAMP
- sakila | rental                     | rental_id            |        1 | int       |        |        10 |     0 | f        | 
- sakila | rental                     | rental_date          |        2 | datetime  |        |         0 |       | f        | 
- sakila | rental                     | inventory_id         |        3 | mediumint |        |         7 |     0 | f        | 
- sakila | rental                     | customer_id          |        4 | smallint  |        |         5 |     0 | f        | 
- sakila | rental                     | return_date          |        5 | datetime  |        |         0 |       | t        | 
- sakila | rental                     | staff_id             |        6 | tinyint   |        |         3 |     0 | f        | 
- sakila | rental                     | last_update          |        7 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | sales_by_film_category     | category             |        1 | varchar   |     25 |           |       | f        | 
- sakila | sales_by_film_category     | total_sales          |        2 | decimal   |        |        27 |     2 | t        | 
- sakila | sales_by_store             | store                |        1 | varchar   |    101 |           |       | t        | 
- sakila | sales_by_store             | manager              |        2 | varchar   |     91 |           |       | t        | 
- sakila | sales_by_store             | total_sales          |        3 | decimal   |        |        27 |     2 | t        | 
- sakila | staff                      | staff_id             |        1 | tinyint   |        |         3 |     0 | f        | 
- sakila | staff                      | first_name           |        2 | varchar   |     45 |           |       | f        | 
- sakila | staff                      | last_name            |        3 | varchar   |     45 |           |       | f        | 
- sakila | staff                      | address_id           |        4 | smallint  |        |         5 |     0 | f        | 
- sakila | staff                      | picture              |        5 | blob      |  65535 |           |       | t        | 
- sakila | staff                      | email                |        6 | varchar   |     50 |           |       | t        | 
- sakila | staff                      | store_id             |        7 | tinyint   |        |         3 |     0 | f        | 
- sakila | staff                      | active               |        8 | tinyint   |        |         3 |     0 | f        | 1
- sakila | staff                      | username             |        9 | varchar   |     16 |           |       | f        | 
- sakila | staff                      | password             |       10 | varchar   |     40 |           |       | t        | 
- sakila | staff                      | last_update          |       11 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
- sakila | staff_list                 | ID                   |        1 | tinyint   |        |         3 |     0 | f        | 0
- sakila | staff_list                 | name                 |        2 | varchar   |     91 |           |       | t        | 
- sakila | staff_list                 | address              |        3 | varchar   |     50 |           |       | f        | 
- sakila | staff_list                 | zip code             |        4 | varchar   |     10 |           |       | t        | 
- sakila | staff_list                 | phone                |        5 | varchar   |     20 |           |       | f        | 
- sakila | staff_list                 | city                 |        6 | varchar   |     50 |           |       | f        | 
- sakila | staff_list                 | country              |        7 | varchar   |     50 |           |       | f        | 
- sakila | staff_list                 | SID                  |        8 | tinyint   |        |         3 |     0 | f        | 
- sakila | store                      | store_id             |        1 | tinyint   |        |         3 |     0 | f        | 
- sakila | store                      | manager_staff_id     |        2 | tinyint   |        |         3 |     0 | f        | 
- sakila | store                      | address_id           |        3 | smallint  |        |         5 |     0 | f        | 
- sakila | store                      | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
-(132 rows)
+   schema   |         table_name         |     column_name      | position | type_name | length | precision | scale | nullable |   default_value   
+------------+----------------------------+----------------------+----------+-----------+--------+-----------+-------+----------+-------------------
+ partitions | employees                  | id                   |        1 | int       |        |        10 |     0 | f        | 
+ partitions | employees                  | fname                |        2 | varchar   |     30 |           |       | t        | 
+ partitions | employees                  | lname                |        3 | varchar   |     30 |           |       | t        | 
+ partitions | employees                  | hired                |        4 | date      |        |           |       | f        | 1970-01-01
+ partitions | employees                  | separated            |        5 | date      |        |           |       | f        | 9999-12-31
+ partitions | employees                  | job_code             |        6 | int       |        |        10 |     0 | t        | 
+ partitions | employees                  | store_id             |        7 | int       |        |        10 |     0 | t        | 
+ partitions | employees_by_date_range    | id                   |        1 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_date_range    | fname                |        2 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_date_range    | lname                |        3 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_date_range    | hired                |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ partitions | employees_by_date_range    | separated            |        5 | timestamp |        |         0 |       | f        | 
+ partitions | employees_by_date_range    | job_code             |        6 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_date_range    | store_id             |        7 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_hash          | id                   |        1 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_hash          | fname                |        2 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_hash          | lname                |        3 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_hash          | hired                |        4 | date      |        |           |       | f        | 1970-01-01
+ partitions | employees_by_hash          | separated            |        5 | date      |        |           |       | f        | 9999-12-31
+ partitions | employees_by_hash          | job_code             |        6 | int       |        |        10 |     0 | t        | 
+ partitions | employees_by_hash          | store_id             |        7 | int       |        |        10 |     0 | t        | 
+ partitions | employees_by_int_range     | id                   |        1 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_int_range     | fname                |        2 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_int_range     | lname                |        3 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_int_range     | hired                |        4 | date      |        |           |       | f        | 1970-01-01
+ partitions | employees_by_int_range     | separated            |        5 | date      |        |           |       | f        | 9999-12-31
+ partitions | employees_by_int_range     | job_code             |        6 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_int_range     | store_id             |        7 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_list          | id                   |        1 | int       |        |        10 |     0 | f        | 
+ partitions | employees_by_list          | fname                |        2 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_list          | lname                |        3 | varchar   |     30 |           |       | t        | 
+ partitions | employees_by_list          | hired                |        4 | date      |        |           |       | f        | 1970-01-01
+ partitions | employees_by_list          | separated            |        5 | date      |        |           |       | f        | 9999-12-31
+ partitions | employees_by_list          | job_code             |        6 | int       |        |        10 |     0 | t        | 
+ partitions | employees_by_list          | store_id             |        7 | int       |        |        10 |     0 | t        | 
+ partitions | subpart_by_range_hash      | id                   |        1 | int       |        |        10 |     0 | t        | 
+ partitions | subpart_by_range_hash      | purchased            |        2 | date      |        |           |       | t        | 
+ sakila     | actor                      | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | actor                      | first_name           |        2 | varchar   |     45 |           |       | f        | 
+ sakila     | actor                      | last_name            |        3 | varchar   |     45 |           |       | f        | 
+ sakila     | actor                      | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | actor_info                 | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 0
+ sakila     | actor_info                 | first_name           |        2 | varchar   |     45 |           |       | f        | 
+ sakila     | actor_info                 | last_name            |        3 | varchar   |     45 |           |       | f        | 
+ sakila     | actor_info                 | film_info            |        4 | text      |  65535 |           |       | t        | 
+ sakila     | address                    | address_id           |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | address                    | address              |        2 | varchar   |     50 |           |       | f        | 
+ sakila     | address                    | address2             |        3 | varchar   |     50 |           |       | t        | 
+ sakila     | address                    | district             |        4 | varchar   |     20 |           |       | f        | 
+ sakila     | address                    | city_id              |        5 | smallint  |        |         5 |     0 | f        | 
+ sakila     | address                    | postal_code          |        6 | varchar   |     10 |           |       | t        | 
+ sakila     | address                    | phone                |        7 | varchar   |     20 |           |       | f        | 
+ sakila     | address                    | location             |        8 | geometry  |        |           |       | f        | 
+ sakila     | address                    | last_update          |        9 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | category                   | category_id          |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | category                   | name                 |        2 | varchar   |     25 |           |       | f        | 
+ sakila     | category                   | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | city                       | city_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | city                       | city                 |        2 | varchar   |     50 |           |       | f        | 
+ sakila     | city                       | country_id           |        3 | smallint  |        |         5 |     0 | f        | 
+ sakila     | city                       | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | country                    | country_id           |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | country                    | country              |        2 | varchar   |     50 |           |       | f        | 
+ sakila     | country                    | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | customer                   | customer_id          |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | customer                   | store_id             |        2 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | customer                   | first_name           |        3 | varchar   |     45 |           |       | f        | 
+ sakila     | customer                   | last_name            |        4 | varchar   |     45 |           |       | f        | 
+ sakila     | customer                   | email                |        5 | varchar   |     50 |           |       | t        | 
+ sakila     | customer                   | address_id           |        6 | smallint  |        |         5 |     0 | f        | 
+ sakila     | customer                   | active               |        7 | tinyint   |        |         3 |     0 | f        | 1
+ sakila     | customer                   | create_date          |        8 | datetime  |        |         0 |       | f        | 
+ sakila     | customer                   | last_update          |        9 | timestamp |        |         0 |       | t        | CURRENT_TIMESTAMP
+ sakila     | customer_list              | ID                   |        1 | smallint  |        |         5 |     0 | f        | 0
+ sakila     | customer_list              | name                 |        2 | varchar   |     91 |           |       | t        | 
+ sakila     | customer_list              | address              |        3 | varchar   |     50 |           |       | f        | 
+ sakila     | customer_list              | zip code             |        4 | varchar   |     10 |           |       | t        | 
+ sakila     | customer_list              | phone                |        5 | varchar   |     20 |           |       | f        | 
+ sakila     | customer_list              | city                 |        6 | varchar   |     50 |           |       | f        | 
+ sakila     | customer_list              | country              |        7 | varchar   |     50 |           |       | f        | 
+ sakila     | customer_list              | notes                |        8 | varchar   |      6 |           |       | f        | 
+ sakila     | customer_list              | SID                  |        9 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | film                       | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | film                       | title                |        2 | varchar   |    128 |           |       | f        | 
+ sakila     | film                       | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila     | film                       | release_year         |        4 | year      |        |           |       | t        | 
+ sakila     | film                       | language_id          |        5 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | film                       | original_language_id |        6 | tinyint   |        |         3 |     0 | t        | 
+ sakila     | film                       | rental_duration      |        7 | tinyint   |        |         3 |     0 | f        | 3
+ sakila     | film                       | rental_rate          |        8 | decimal   |        |         4 |     2 | f        | 4.99
+ sakila     | film                       | length               |        9 | smallint  |        |         5 |     0 | t        | 
+ sakila     | film                       | replacement_cost     |       10 | decimal   |        |         5 |     2 | f        | 19.99
+ sakila     | film                       | rating               |       11 | enum      |      5 |           |       | t        | G
+ sakila     | film                       | special_features     |       12 | set       |     54 |           |       | t        | 
+ sakila     | film                       | last_update          |       13 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | film_actor                 | actor_id             |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | film_actor                 | film_id              |        2 | smallint  |        |         5 |     0 | f        | 
+ sakila     | film_actor                 | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | film_category              | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | film_category              | category_id          |        2 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | film_category              | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | film_list                  | FID                  |        1 | smallint  |        |         5 |     0 | t        | 0
+ sakila     | film_list                  | title                |        2 | varchar   |    128 |           |       | t        | 
+ sakila     | film_list                  | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila     | film_list                  | category             |        4 | varchar   |     25 |           |       | f        | 
+ sakila     | film_list                  | price                |        5 | decimal   |        |         4 |     2 | t        | 4.99
+ sakila     | film_list                  | length               |        6 | smallint  |        |         5 |     0 | t        | 
+ sakila     | film_list                  | rating               |        7 | enum      |      5 |           |       | t        | G
+ sakila     | film_list                  | actors               |        8 | text      |  65535 |           |       | t        | 
+ sakila     | film_text                  | film_id              |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | film_text                  | title                |        2 | varchar   |    255 |           |       | f        | 
+ sakila     | film_text                  | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila     | inventory                  | inventory_id         |        1 | mediumint |        |         7 |     0 | f        | 
+ sakila     | inventory                  | film_id              |        2 | smallint  |        |         5 |     0 | f        | 
+ sakila     | inventory                  | store_id             |        3 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | inventory                  | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | language                   | language_id          |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | language                   | name                 |        2 | char      |     20 |           |       | f        | 
+ sakila     | language                   | last_update          |        3 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | nicer_but_slower_film_list | FID                  |        1 | smallint  |        |         5 |     0 | t        | 0
+ sakila     | nicer_but_slower_film_list | title                |        2 | varchar   |    128 |           |       | t        | 
+ sakila     | nicer_but_slower_film_list | description          |        3 | text      |  65535 |           |       | t        | 
+ sakila     | nicer_but_slower_film_list | category             |        4 | varchar   |     25 |           |       | f        | 
+ sakila     | nicer_but_slower_film_list | price                |        5 | decimal   |        |         4 |     2 | t        | 4.99
+ sakila     | nicer_but_slower_film_list | length               |        6 | smallint  |        |         5 |     0 | t        | 
+ sakila     | nicer_but_slower_film_list | rating               |        7 | enum      |      5 |           |       | t        | G
+ sakila     | nicer_but_slower_film_list | actors               |        8 | text      |  65535 |           |       | t        | 
+ sakila     | payment                    | payment_id           |        1 | smallint  |        |         5 |     0 | f        | 
+ sakila     | payment                    | customer_id          |        2 | smallint  |        |         5 |     0 | f        | 
+ sakila     | payment                    | staff_id             |        3 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | payment                    | rental_id            |        4 | int       |        |        10 |     0 | t        | 
+ sakila     | payment                    | amount               |        5 | decimal   |        |         5 |     2 | f        | 
+ sakila     | payment                    | payment_date         |        6 | datetime  |        |         0 |       | f        | 
+ sakila     | payment                    | last_update          |        7 | timestamp |        |         0 |       | t        | CURRENT_TIMESTAMP
+ sakila     | rental                     | rental_id            |        1 | int       |        |        10 |     0 | f        | 
+ sakila     | rental                     | rental_date          |        2 | datetime  |        |         0 |       | f        | 
+ sakila     | rental                     | inventory_id         |        3 | mediumint |        |         7 |     0 | f        | 
+ sakila     | rental                     | customer_id          |        4 | smallint  |        |         5 |     0 | f        | 
+ sakila     | rental                     | return_date          |        5 | datetime  |        |         0 |       | t        | 
+ sakila     | rental                     | staff_id             |        6 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | rental                     | last_update          |        7 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | sales_by_film_category     | category             |        1 | varchar   |     25 |           |       | f        | 
+ sakila     | sales_by_film_category     | total_sales          |        2 | decimal   |        |        27 |     2 | t        | 
+ sakila     | sales_by_store             | store                |        1 | varchar   |    101 |           |       | t        | 
+ sakila     | sales_by_store             | manager              |        2 | varchar   |     91 |           |       | t        | 
+ sakila     | sales_by_store             | total_sales          |        3 | decimal   |        |        27 |     2 | t        | 
+ sakila     | staff                      | staff_id             |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | staff                      | first_name           |        2 | varchar   |     45 |           |       | f        | 
+ sakila     | staff                      | last_name            |        3 | varchar   |     45 |           |       | f        | 
+ sakila     | staff                      | address_id           |        4 | smallint  |        |         5 |     0 | f        | 
+ sakila     | staff                      | picture              |        5 | blob      |  65535 |           |       | t        | 
+ sakila     | staff                      | email                |        6 | varchar   |     50 |           |       | t        | 
+ sakila     | staff                      | store_id             |        7 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | staff                      | active               |        8 | tinyint   |        |         3 |     0 | f        | 1
+ sakila     | staff                      | username             |        9 | varchar   |     16 |           |       | f        | 
+ sakila     | staff                      | password             |       10 | varchar   |     40 |           |       | t        | 
+ sakila     | staff                      | last_update          |       11 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+ sakila     | staff_list                 | ID                   |        1 | tinyint   |        |         3 |     0 | f        | 0
+ sakila     | staff_list                 | name                 |        2 | varchar   |     91 |           |       | t        | 
+ sakila     | staff_list                 | address              |        3 | varchar   |     50 |           |       | f        | 
+ sakila     | staff_list                 | zip code             |        4 | varchar   |     10 |           |       | t        | 
+ sakila     | staff_list                 | phone                |        5 | varchar   |     20 |           |       | f        | 
+ sakila     | staff_list                 | city                 |        6 | varchar   |     50 |           |       | f        | 
+ sakila     | staff_list                 | country              |        7 | varchar   |     50 |           |       | f        | 
+ sakila     | staff_list                 | SID                  |        8 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | store                      | store_id             |        1 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | store                      | manager_staff_id     |        2 | tinyint   |        |         3 |     0 | f        | 
+ sakila     | store                      | address_id           |        3 | smallint  |        |         5 |     0 | f        | 
+ sakila     | store                      | last_update          |        4 | timestamp |        |         0 |       | f        | CURRENT_TIMESTAMP
+(169 rows)
 
 SELECT * FROM fdw_stage.checks ORDER BY schema, table_name, constraint_name;
  schema | table_name |        constraint_name        | deferrable | deferred |                                                     condition                                                     
@@ -974,52 +1074,61 @@ SELECT * FROM fdw_stage.column_privs ORDER BY schema, table_name, privilege;
 (0 rows)
 
 SELECT * FROM fdw_stage.segments ORDER BY schema, segment_name, segment_type;
- schema |        segment_name         | segment_type | bytes  
---------+-----------------------------+--------------+--------
- sakila | actor                       | TABLE        |  16384
- sakila | address                     | TABLE        |  98304
- sakila | category                    | TABLE        |  16384
- sakila | city                        | TABLE        |  49152
- sakila | country                     | TABLE        |  16384
- sakila | customer                    | TABLE        |  81920
- sakila | film                        | TABLE        | 196608
- sakila | film_actor                  | TABLE        | 196608
- sakila | film_category               | TABLE        |  65536
- sakila | film_text                   | TABLE        | 180224
- sakila | fk_film_category_category   | INDEX        |  16384
- sakila | fk_payment_rental           | INDEX        |  16384
- sakila | FTS_DOC_ID_INDEX            | INDEX        |  16384
- sakila | idx_actor_last_name         | INDEX        |  16384
- sakila | idx_fk_address_id           | INDEX        |  49152
- sakila | idx_fk_city_id              | INDEX        |  16384
- sakila | idx_fk_country_id           | INDEX        |  16384
- sakila | idx_fk_customer_id          | INDEX        |  32768
- sakila | idx_fk_film_id              | INDEX        | 163840
- sakila | idx_fk_inventory_id         | INDEX        |  16384
- sakila | idx_fk_language_id          | INDEX        |  16384
- sakila | idx_fk_original_language_id | INDEX        |  16384
- sakila | idx_fk_staff_id             | INDEX        |  32768
- sakila | idx_fk_store_id             | INDEX        |  32768
- sakila | idx_last_name               | INDEX        |  16384
- sakila | idx_store_id_film_id        | INDEX        | 114688
- sakila | idx_title                   | INDEX        |  49152
- sakila | idx_unique_manager          | INDEX        |  16384
- sakila | inventory                   | TABLE        | 180224
- sakila | language                    | TABLE        |  16384
- sakila | payment                     | TABLE        |  16384
- sakila | rental                      | TABLE        |  16384
- sakila | rental_date                 | INDEX        |  16384
- sakila | staff                       | TABLE        |  16384
- sakila | store                       | TABLE        |  16384
-(35 rows)
+   schema   |        segment_name         | segment_type | bytes  
+------------+-----------------------------+--------------+--------
+ partitions | employees                   | TABLE        |  16384
+ partitions | employees_by_date_range     | TABLE        |  32768
+ partitions | employees_by_hash           | TABLE        |  65536
+ partitions | employees_by_int_range      | TABLE        |  81920
+ partitions | employees_by_list           | TABLE        |  65536
+ partitions | GEN_CLUST_INDEX             | INDEX        | 360448
+ partitions | subpart_by_range_hash       | TABLE        |  98304
+ sakila     | actor                       | TABLE        |  16384
+ sakila     | address                     | TABLE        |  98304
+ sakila     | category                    | TABLE        |  16384
+ sakila     | city                        | TABLE        |  49152
+ sakila     | country                     | TABLE        |  16384
+ sakila     | customer                    | TABLE        |  81920
+ sakila     | film                        | TABLE        | 196608
+ sakila     | film_actor                  | TABLE        | 196608
+ sakila     | film_category               | TABLE        |  65536
+ sakila     | film_text                   | TABLE        | 180224
+ sakila     | fk_film_category_category   | INDEX        |  16384
+ sakila     | fk_payment_rental           | INDEX        |  16384
+ sakila     | FTS_DOC_ID_INDEX            | INDEX        |  16384
+ sakila     | idx_actor_last_name         | INDEX        |  16384
+ sakila     | idx_fk_address_id           | INDEX        |  49152
+ sakila     | idx_fk_city_id              | INDEX        |  16384
+ sakila     | idx_fk_country_id           | INDEX        |  16384
+ sakila     | idx_fk_customer_id          | INDEX        |  32768
+ sakila     | idx_fk_film_id              | INDEX        | 163840
+ sakila     | idx_fk_inventory_id         | INDEX        |  16384
+ sakila     | idx_fk_language_id          | INDEX        |  16384
+ sakila     | idx_fk_original_language_id | INDEX        |  16384
+ sakila     | idx_fk_staff_id             | INDEX        |  32768
+ sakila     | idx_fk_store_id             | INDEX        |  32768
+ sakila     | idx_last_name               | INDEX        |  16384
+ sakila     | idx_store_id_film_id        | INDEX        | 114688
+ sakila     | idx_title                   | INDEX        |  49152
+ sakila     | idx_unique_manager          | INDEX        |  16384
+ sakila     | inventory                   | TABLE        | 180224
+ sakila     | language                    | TABLE        |  16384
+ sakila     | payment                     | TABLE        |  16384
+ sakila     | rental                      | TABLE        |  16384
+ sakila     | rental_date                 | INDEX        |  16384
+ sakila     | staff                       | TABLE        |  16384
+ sakila     | store                       | TABLE        |  16384
+(42 rows)
 
 SELECT * FROM fdw_stage.migration_cost_estimate ORDER BY schema, task_type;
- schema |   task_type    | task_content | task_unit  | migration_hours 
---------+----------------+--------------+------------+-----------------
- sakila | data_migration |      1179648 | bytes      |               1
- sakila | functions      |         5387 | characters |              11
- sakila | tables         |           16 | count      |               2
- sakila | triggers       |          583 | characters |               2
- sakila | views          |         5183 | characters |              11
-(5 rows)
+   schema   |   task_type    | task_content | task_unit  | migration_hours 
+------------+----------------+--------------+------------+-----------------
+ partitions | data_migration |       360448 | bytes      |               1
+ partitions | tables         |            6 | count      |               1
+ sakila     | data_migration |      1179648 | bytes      |               1
+ sakila     | functions      |         5387 | characters |              11
+ sakila     | tables         |           16 | count      |               2
+ sakila     | triggers       |          583 | characters |               2
+ sakila     | views          |         5183 | characters |              11
+(7 rows)
 
