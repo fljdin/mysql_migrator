@@ -1,0 +1,193 @@
+/* connect as migration user */
+\connect - migrator
+SET client_min_messages = WARNING;
+/* set up staging schemas */
+SELECT db_migrate_prepare(
+   plugin => 'mysql_migrator',
+   server => 'mysql',
+   only_schemas => '{partitions}'
+);
+ db_migrate_prepare 
+--------------------
+                  0
+(1 row)
+
+/* quote character expression */
+UPDATE pgsql_stage.columns 
+   SET default_value = quote_literal(default_value)
+   WHERE NOT regexp_like(default_value, '^\-?[0-9]+$')
+   AND default_value <> 'CURRENT_TIMESTAMP';
+/* convert key based on MySQL function */
+UPDATE pgsql_stage.partitions
+   SET key = mysql_translate_expression(key);
+UPDATE pgsql_stage.subpartitions
+   SET key = mysql_translate_expression(key);
+/* convert simple table to partitioned table */
+INSERT INTO pgsql_stage.partitions 
+   (schema, table_name, partition_name, orig_name, type, key, is_default, values)
+VALUES
+   ('partitions', 'employees', 'employees_2000', 'employees_2000', 'RANGE', 'hired', false, '{MINVALUE, ''2000-01-01''}'),
+   ('partitions', 'employees', 'employees_2010', 'employees_2010', 'RANGE', 'hired', false, '{''2000-01-01'', ''2010-01-01''}'),
+   ('partitions', 'employees', 'employees_2020', 'employees_2020', 'RANGE', 'hired', false, '{''2010-01-01'', ''2020-01-01''}'),
+   ('partitions', 'employees', 'employees_default', 'employees_default', 'RANGE', 'hired', true, '{}');
+/* perform the data migration */
+SELECT db_migrate_mkforeign(
+   plugin => 'mysql_migrator',
+   server => 'mysql'
+);
+ db_migrate_mkforeign 
+----------------------
+                    0
+(1 row)
+
+SELECT db_migrate_tables(
+   plugin => 'mysql_migrator'
+);
+ db_migrate_tables 
+-------------------
+                 0
+(1 row)
+
+/* we have to check the log table before we drop the schema */
+SELECT operation, schema_name, object_name, failed_sql, error_message
+FROM pgsql_stage.migrate_log
+ORDER BY log_time \gx
+(0 rows)
+
+SELECT db_migrate_finish();
+ db_migrate_finish 
+-------------------
+                 0
+(1 row)
+
+\d+ partitions.employees
+                                  Partitioned table "partitions.employees"
+  Column   |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description 
+-----------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id        | integer               |           | not null |         | plain    |              | 
+ fname     | character varying(30) |           |          |         | extended |              | 
+ lname     | character varying(30) |           |          |         | extended |              | 
+ hired     | date                  |           | not null |         | plain    |              | 
+ separated | date                  |           | not null |         | plain    |              | 
+ job_code  | integer               |           |          |         | plain    |              | 
+ store_id  | integer               |           |          |         | plain    |              | 
+Partition key: RANGE (hired)
+Partitions: partitions.employees_2000 FOR VALUES FROM (MINVALUE) TO ('01-01-2000'),
+            partitions.employees_2010 FOR VALUES FROM ('01-01-2000') TO ('01-01-2010'),
+            partitions.employees_2020 FOR VALUES FROM ('01-01-2010') TO ('01-01-2020'),
+            partitions.employees_default DEFAULT
+
+\d+ partitions.employees_by_list
+                              Partitioned table "partitions.employees_by_list"
+  Column   |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description 
+-----------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id        | integer               |           | not null |         | plain    |              | 
+ fname     | character varying(30) |           |          |         | extended |              | 
+ lname     | character varying(30) |           |          |         | extended |              | 
+ hired     | date                  |           | not null |         | plain    |              | 
+ separated | date                  |           | not null |         | plain    |              | 
+ job_code  | integer               |           |          |         | plain    |              | 
+ store_id  | integer               |           |          |         | plain    |              | 
+Partition key: LIST (store_id)
+Partitions: partitions."pCentral" FOR VALUES IN (7, 8, 15, 16),
+            partitions."pEast" FOR VALUES IN (1, 2, 10, 11, 19, 20),
+            partitions."pNorth" FOR VALUES IN (3, 5, 6, 9, 17),
+            partitions."pWest" FOR VALUES IN (4, 12, 13, 14, 18)
+
+\d+ partitions.employees_by_int_range
+                           Partitioned table "partitions.employees_by_int_range"
+  Column   |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description 
+-----------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id        | integer               |           | not null |         | plain    |              | 
+ fname     | character varying(30) |           |          |         | extended |              | 
+ lname     | character varying(30) |           |          |         | extended |              | 
+ hired     | date                  |           | not null |         | plain    |              | 
+ separated | date                  |           | not null |         | plain    |              | 
+ job_code  | integer               |           | not null |         | plain    |              | 
+ store_id  | integer               |           | not null |         | plain    |              | 
+Partition key: RANGE (store_id)
+Partitions: partitions.p_less_than_11 FOR VALUES FROM (6) TO (11),
+            partitions.p_less_than_16 FOR VALUES FROM (11) TO (16),
+            partitions.p_less_than_21 FOR VALUES FROM (16) TO (21),
+            partitions.p_less_than_6 FOR VALUES FROM (MINVALUE) TO (6),
+            partitions.p_less_than_max FOR VALUES FROM (21) TO (MAXVALUE)
+
+\d+ partitions.employees_by_date_range
+                              Partitioned table "partitions.employees_by_date_range"
+  Column   |            Type             | Collation | Nullable | Default | Storage  | Stats target | Description 
+-----------+-----------------------------+-----------+----------+---------+----------+--------------+-------------
+ id        | integer                     |           | not null |         | plain    |              | 
+ fname     | character varying(30)       |           |          |         | extended |              | 
+ lname     | character varying(30)       |           |          |         | extended |              | 
+ hired     | timestamp without time zone |           | not null |         | plain    |              | 
+ separated | timestamp without time zone |           | not null |         | plain    |              | 
+ job_code  | integer                     |           | not null |         | plain    |              | 
+ store_id  | integer                     |           | not null |         | plain    |              | 
+Partition key: RANGE (EXTRACT(epoch FROM hired))
+Partitions: partitions.post2000 FOR VALUES FROM ('946684800') TO (MAXVALUE),
+            partitions.pre2000 FOR VALUES FROM (MINVALUE) TO ('946684800')
+
+\d+ partitions.employees_by_hash
+                              Partitioned table "partitions.employees_by_hash"
+  Column   |         Type          | Collation | Nullable | Default | Storage  | Stats target | Description 
+-----------+-----------------------+-----------+----------+---------+----------+--------------+-------------
+ id        | integer               |           | not null |         | plain    |              | 
+ fname     | character varying(30) |           |          |         | extended |              | 
+ lname     | character varying(30) |           |          |         | extended |              | 
+ hired     | date                  |           | not null |         | plain    |              | 
+ separated | date                  |           | not null |         | plain    |              | 
+ job_code  | integer               |           |          |         | plain    |              | 
+ store_id  | integer               |           |          |         | plain    |              | 
+Partition key: HASH (store_id)
+Partitions: partitions.p0 FOR VALUES WITH (modulus 4, remainder 0),
+            partitions.p1 FOR VALUES WITH (modulus 4, remainder 1),
+            partitions.p2 FOR VALUES WITH (modulus 4, remainder 2),
+            partitions.p3 FOR VALUES WITH (modulus 4, remainder 3)
+
+\d+ partitions.subpart_by_range_hash
+                    Partitioned table "partitions.subpart_by_range_hash"
+  Column   |  Type   | Collation | Nullable | Default | Storage | Stats target | Description 
+-----------+---------+-----------+----------+---------+---------+--------------+-------------
+ id        | integer |           |          |         | plain   |              | 
+ purchased | date    |           |          |         | plain   |              | 
+Partition key: RANGE (EXTRACT(year FROM purchased))
+Partitions: partitions.subpart_less_than_1990 FOR VALUES FROM (MINVALUE) TO ('1990'), PARTITIONED,
+            partitions.subpart_less_than_2000 FOR VALUES FROM ('1990') TO ('2000'), PARTITIONED,
+            partitions.subpart_less_than_max FOR VALUES FROM ('2000') TO (MAXVALUE), PARTITIONED
+
+\d+ partitions.subpart_less_than_1990
+                    Partitioned table "partitions.subpart_less_than_1990"
+  Column   |  Type   | Collation | Nullable | Default | Storage | Stats target | Description 
+-----------+---------+-----------+----------+---------+---------+--------------+-------------
+ id        | integer |           |          |         | plain   |              | 
+ purchased | date    |           |          |         | plain   |              | 
+Partition of: partitions.subpart_by_range_hash FOR VALUES FROM (MINVALUE) TO ('1990')
+Partition constraint: ((EXTRACT(year FROM purchased) IS NOT NULL) AND (EXTRACT(year FROM purchased) < '1990'::numeric))
+Partition key: HASH (EXTRACT(day FROM purchased))
+Partitions: partitions.subpart_less_than_1990sp0 FOR VALUES WITH (modulus 2, remainder 0),
+            partitions.subpart_less_than_1990sp1 FOR VALUES WITH (modulus 2, remainder 1)
+
+\d+ partitions.subpart_less_than_2000
+                    Partitioned table "partitions.subpart_less_than_2000"
+  Column   |  Type   | Collation | Nullable | Default | Storage | Stats target | Description 
+-----------+---------+-----------+----------+---------+---------+--------------+-------------
+ id        | integer |           |          |         | plain   |              | 
+ purchased | date    |           |          |         | plain   |              | 
+Partition of: partitions.subpart_by_range_hash FOR VALUES FROM ('1990') TO ('2000')
+Partition constraint: ((EXTRACT(year FROM purchased) IS NOT NULL) AND (EXTRACT(year FROM purchased) >= '1990'::numeric) AND (EXTRACT(year FROM purchased) < '2000'::numeric))
+Partition key: HASH (EXTRACT(day FROM purchased))
+Partitions: partitions.subpart_less_than_2000sp0 FOR VALUES WITH (modulus 2, remainder 0),
+            partitions.subpart_less_than_2000sp1 FOR VALUES WITH (modulus 2, remainder 1)
+
+\d+ partitions.subpart_less_than_max
+                    Partitioned table "partitions.subpart_less_than_max"
+  Column   |  Type   | Collation | Nullable | Default | Storage | Stats target | Description 
+-----------+---------+-----------+----------+---------+---------+--------------+-------------
+ id        | integer |           |          |         | plain   |              | 
+ purchased | date    |           |          |         | plain   |              | 
+Partition of: partitions.subpart_by_range_hash FOR VALUES FROM ('2000') TO (MAXVALUE)
+Partition constraint: ((EXTRACT(year FROM purchased) IS NOT NULL) AND (EXTRACT(year FROM purchased) >= '2000'::numeric))
+Partition key: HASH (EXTRACT(day FROM purchased))
+Partitions: partitions.subpart_less_than_maxsp0 FOR VALUES WITH (modulus 2, remainder 0),
+            partitions.subpart_less_than_maxsp1 FOR VALUES WITH (modulus 2, remainder 1)
+

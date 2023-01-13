@@ -97,7 +97,7 @@ DECLARE
    catalog_tables varchar(64)[] := ARRAY[
       'SCHEMATA', 'TABLES', 'COLUMNS', 'TABLE_CONSTRAINTS', 'CHECK_CONSTRAINTS',
       'KEY_COLUMN_USAGE', 'REFERENTIAL_CONSTRAINTS', 'VIEWS', 'PARAMETERS',
-      'STATISTICS', 'TABLE_PRIVILEGES', 'COLUMN_PRIVILEGES'
+      'STATISTICS', 'TABLE_PRIVILEGES', 'COLUMN_PRIVILEGES', 'PARTITIONS'
    ];
    sys_schemas text := $$ 'information_schema', 'mysql', 'performance_schema', 'sys' $$;
 
@@ -302,6 +302,65 @@ DECLARE
       COMMENT ON VIEW %1$I.indexes IS 'MySQL indexes on foreign server "%3$I"';
    $$;
 
+   /* partitions */
+   partitions_sql text := $$
+      CREATE OR REPLACE VIEW %1$I.partitions AS
+         WITH catalog AS (
+            SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
+                  "PARTITION_NAME" AS partition_name, "PARTITION_METHOD" AS type,
+                  trim('`' FROM "PARTITION_EXPRESSION") AS key,
+                  "PARTITION_ORDINAL_POSITION" AS position,
+                  "PARTITION_DESCRIPTION" AS values
+               FROM %1$I."PARTITIONS"
+               WHERE "TABLE_SCHEMA" NOT IN (%2$s) AND "PARTITION_NAME" IS NOT NULL
+               AND ("SUBPARTITION_ORDINAL_POSITION" IS NULL OR "SUBPARTITION_ORDINAL_POSITION" = 1)
+         ), list_partitions AS (
+            -- retrieves values[any, ...]
+            SELECT schema, table_name, partition_name, type, key,
+               (values IS NULL) AS is_default,
+               string_to_array(values, ',') AS values
+            FROM catalog WHERE type = 'LIST'
+         ), range_partitions AS (
+            -- retrieves values[lower_bound, upper_bound]
+            SELECT schema, table_name, partition_name, type, key, false,
+               ARRAY[
+                  lag(values, 1, 'MINVALUE')
+                     OVER (PARTITION BY schema, table_name ORDER BY position),
+                  values
+               ] AS values
+            FROM catalog WHERE type = 'RANGE'
+         ), hash_partitions AS (
+            -- retrieves values[modulus, remainder]
+            SELECT schema, table_name, partition_name, type, key, false,
+               ARRAY[(position - 1)::text] AS values
+            FROM catalog WHERE type = 'HASH'
+         )
+         SELECT * FROM list_partitions
+         UNION SELECT * FROM range_partitions
+         UNION SELECT * FROM hash_partitions;
+      COMMENT ON VIEW %1$I.partitions IS 'MySQL partitions on foreign server "%3$I"';
+   $$;
+
+   /* subpartitions */
+   subpartitions_sql text := $$
+      CREATE OR REPLACE VIEW %1$I.subpartitions AS
+         WITH catalog AS (
+            SELECT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
+               "PARTITION_NAME" AS partition_name, "SUBPARTITION_NAME" AS subpartition_name, 
+               "SUBPARTITION_METHOD" AS type, 
+               trim('`' FROM "SUBPARTITION_EXPRESSION") AS key,
+               "SUBPARTITION_ORDINAL_POSITION" AS position
+            FROM %1$I."PARTITIONS"
+            WHERE "TABLE_SCHEMA" NOT IN (%2$s)
+            AND "PARTITION_NAME" IS NOT NULL AND "SUBPARTITION_NAME" IS NOT NULL
+         )
+         -- MySQL only supports HASH subpartition method
+         SELECT schema, table_name, partition_name, subpartition_name, type, key, 
+            false AS is_default, ARRAY[(position - 1)::text] AS values
+         FROM catalog WHERE type = 'HASH';
+      COMMENT ON VIEW %1$I.partitions IS 'MySQL subpartitions on foreign server "%3$I"';
+   $$;
+
    /* triggers */   
    triggers_sql text := $$
       DROP FOREIGN TABLE IF EXISTS %1$I."TRIGGERS" CASCADE;
@@ -410,31 +469,6 @@ DECLARE
          FROM %1$I.views GROUP BY schema;
       COMMENT ON VIEW %1$I.migration_cost_estimate IS 'Estimate of the migration costs per schema and object type';
    $$;
-
-   /* test_error */
-   test_error_sql text := $$
-      CREATE TABLE %1$I.test_error (
-         log_time timestamp with time zone NOT NULL DEFAULT current_timestamp,
-         schema name NOT NULL,
-         table_name name NOT NULL,
-         rowid text NOT NULL,
-         message text NOT NULL,
-         PRIMARY KEY (schema, table_name, log_time, rowid)
-      );
-      COMMENT ON TABLE %1$I.test_error IS 'Errors from the last run of "mysql_migrate_test_data"';
-   $$;
-
-   /* test_error_stats */
-   test_error_stats_sql text := $$
-      CREATE TABLE %1$I.test_error_stats (
-         log_time timestamp with time zone NOT NULL,
-         schema name NOT NULL,
-         table_name name NOT NULL,
-         errcount bigint NOT NULL,
-         PRIMARY KEY (schema, table_name, log_time)
-      );
-      COMMENT ON TABLE %1$I.test_error IS 'Cumulative errors from previous runs of "mysql_migrate_test_data"';
-   $$;
    
 BEGIN
    /* remember old setting */
@@ -472,13 +506,13 @@ BEGIN
    EXECUTE format(sequences_sql, schema, sys_schemas, server);
    EXECUTE format(index_columns_sql, schema, sys_schemas, server);
    EXECUTE format(indexes_sql, schema, sys_schemas, server);
+   EXECUTE format(partitions_sql, schema, sys_schemas, server);
+   EXECUTE format(subpartitions_sql, schema, sys_schemas, server);
    EXECUTE format(triggers_sql, schema, sys_schemas, server);
    EXECUTE format(table_privs_sql, schema, sys_schemas, server);
    EXECUTE format(column_privs_sql, schema, sys_schemas, server);
    EXECUTE format(segments_sql, schema, sys_schemas, server);
    EXECUTE format(migration_cost_estimate_sql, schema);
-   EXECUTE format(test_error_sql, schema);
-   EXECUTE format(test_error_stats_sql, schema);
 
    /* reset client_min_messages */
    EXECUTE 'SET LOCAL client_min_messages = ' || old_msglevel;
@@ -613,6 +647,10 @@ CREATE FUNCTION mysql_translate_expression(s text) RETURNS text
    LANGUAGE plpgsql IMMUTABLE STRICT SET search_path FROM CURRENT AS
 $mysql_translate_expression$
 BEGIN
+   s := regexp_replace(s, '^unix_timestamp\(`([^`]*)`\)$', 'EXTRACT(epoch FROM \1)', 'i');
+   s := regexp_replace(s, '^year\(`([^`]*)`\)$', 'EXTRACT(year FROM \1)', 'i');
+   s := regexp_replace(s, '^to_days\(`([^`]*)`\)$', 'EXTRACT(day FROM \1)', 'i');
+
    RETURN s;
 END;
 $mysql_translate_expression$;
