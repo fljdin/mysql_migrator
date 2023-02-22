@@ -397,7 +397,7 @@ FDW options: (dbname 'mysql', table_name 'innodb_index_stats')
  table_name     | character varying(64) |           |          | 
  partition_name | character varying(64) |           |          | 
  type           | character varying(13) |           |          | 
- expression     | text                  |           |          | 
+ key            | text                  |           |          | 
  is_default     | boolean               |           |          | 
  values         | text[]                |           |          | 
 
@@ -434,7 +434,7 @@ FDW options: (dbname 'mysql', table_name 'innodb_index_stats')
  partition_name    | character varying(64) |           |          | 
  subpartition_name | character varying(64) |           |          | 
  type              | character varying(13) |           |          | 
- expression        | text                  |           |          | 
+ key               | text                  |           |          | 
  is_default        | boolean               |           |          | 
  values            | text[]                |           |          | 
 

@@ -17,11 +17,6 @@ UPDATE pgsql_stage.columns
    SET default_value = quote_literal(default_value)
    WHERE NOT regexp_like(default_value, '^\-?[0-9]+$')
    AND default_value <> 'CURRENT_TIMESTAMP';
-/* convert key based on MySQL function */
-UPDATE pgsql_stage.partitions
-   SET key = mysql_translate_expression(key);
-UPDATE pgsql_stage.subpartitions
-   SET key = mysql_translate_expression(key);
 /* convert simple table to partitioned table */
 INSERT INTO pgsql_stage.partitions 
    (schema, table_name, partition_name, orig_name, type, key, is_default, values)
