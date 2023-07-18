@@ -349,14 +349,15 @@ FDW options: (dbname 'information_schema', table_name 'VIEWS')
  is_expression | boolean               |           |          | 
  column_name   | character varying(64) |           |          | 
 
-                      View "fdw_stage.indexes"
-   Column   |         Type          | Collation | Nullable | Default 
-------------+-----------------------+-----------+----------+---------
- schema     | character varying(64) |           |          | 
- table_name | character varying(64) |           |          | 
- index_name | character varying(64) |           |          | 
- index_type | character varying(11) |           |          | 
- uniqueness | boolean               |           |          | 
+                       View "fdw_stage.indexes"
+    Column    |         Type          | Collation | Nullable | Default 
+--------------+-----------------------+-----------+----------+---------
+ schema       | character varying(64) |           |          | 
+ table_name   | character varying(64) |           |          | 
+ index_name   | character varying(64) |           |          | 
+ index_type   | character varying(11) |           |          | 
+ uniqueness   | boolean               |           |          | 
+ where_clause | text                  |           |          | 
 
                        Foreign table "fdw_stage.innodb_index_stats"
       Column      |          Type           | Collation | Nullable | Default | FDW options 
@@ -968,34 +969,34 @@ SELECT * FROM fdw_stage.index_columns ORDER BY schema, table_name, index_name, p
 (30 rows)
 
 SELECT * FROM fdw_stage.indexes ORDER BY schema, table_name, index_name;
- schema |  table_name   |               index_name                | index_type | uniqueness 
---------+---------------+-----------------------------------------+------------+------------
- sakila | actor         | actor_idx_actor_last_name               | BTREE      | f
- sakila | address       | address_idx_fk_city_id                  | BTREE      | f
- sakila | address       | address_idx_location                    | SPATIAL    | f
- sakila | city          | city_idx_fk_country_id                  | BTREE      | f
- sakila | customer      | customer_idx_fk_address_id              | BTREE      | f
- sakila | customer      | customer_idx_fk_store_id                | BTREE      | f
- sakila | customer      | customer_idx_last_name                  | BTREE      | f
- sakila | film          | film_idx_fk_language_id                 | BTREE      | f
- sakila | film          | film_idx_fk_original_language_id        | BTREE      | f
- sakila | film          | film_idx_title                          | BTREE      | f
- sakila | film_actor    | film_actor_idx_fk_film_id               | BTREE      | f
- sakila | film_category | film_category_fk_film_category_category | BTREE      | f
- sakila | film_text     | film_text_idx_title_description         | FULLTEXT   | f
- sakila | inventory     | inventory_idx_fk_film_id                | BTREE      | f
- sakila | inventory     | inventory_idx_store_id_film_id          | BTREE      | f
- sakila | payment       | payment_fk_payment_rental               | BTREE      | f
- sakila | payment       | payment_idx_fk_customer_id              | BTREE      | f
- sakila | payment       | payment_idx_fk_staff_id                 | BTREE      | f
- sakila | rental        | rental_idx_fk_customer_id               | BTREE      | f
- sakila | rental        | rental_idx_fk_inventory_id              | BTREE      | f
- sakila | rental        | rental_idx_fk_staff_id                  | BTREE      | f
- sakila | rental        | rental_rental_date                      | BTREE      | t
- sakila | staff         | staff_idx_fk_address_id                 | BTREE      | f
- sakila | staff         | staff_idx_fk_store_id                   | BTREE      | f
- sakila | store         | store_idx_fk_address_id                 | BTREE      | f
- sakila | store         | store_idx_unique_manager                | BTREE      | t
+ schema |  table_name   |               index_name                | index_type | uniqueness | where_clause 
+--------+---------------+-----------------------------------------+------------+------------+--------------
+ sakila | actor         | actor_idx_actor_last_name               | BTREE      | f          | 
+ sakila | address       | address_idx_fk_city_id                  | BTREE      | f          | 
+ sakila | address       | address_idx_location                    | SPATIAL    | f          | 
+ sakila | city          | city_idx_fk_country_id                  | BTREE      | f          | 
+ sakila | customer      | customer_idx_fk_address_id              | BTREE      | f          | 
+ sakila | customer      | customer_idx_fk_store_id                | BTREE      | f          | 
+ sakila | customer      | customer_idx_last_name                  | BTREE      | f          | 
+ sakila | film          | film_idx_fk_language_id                 | BTREE      | f          | 
+ sakila | film          | film_idx_fk_original_language_id        | BTREE      | f          | 
+ sakila | film          | film_idx_title                          | BTREE      | f          | 
+ sakila | film_actor    | film_actor_idx_fk_film_id               | BTREE      | f          | 
+ sakila | film_category | film_category_fk_film_category_category | BTREE      | f          | 
+ sakila | film_text     | film_text_idx_title_description         | FULLTEXT   | f          | 
+ sakila | inventory     | inventory_idx_fk_film_id                | BTREE      | f          | 
+ sakila | inventory     | inventory_idx_store_id_film_id          | BTREE      | f          | 
+ sakila | payment       | payment_fk_payment_rental               | BTREE      | f          | 
+ sakila | payment       | payment_idx_fk_customer_id              | BTREE      | f          | 
+ sakila | payment       | payment_idx_fk_staff_id                 | BTREE      | f          | 
+ sakila | rental        | rental_idx_fk_customer_id               | BTREE      | f          | 
+ sakila | rental        | rental_idx_fk_inventory_id              | BTREE      | f          | 
+ sakila | rental        | rental_idx_fk_staff_id                  | BTREE      | f          | 
+ sakila | rental        | rental_rental_date                      | BTREE      | t          | 
+ sakila | staff         | staff_idx_fk_address_id                 | BTREE      | f          | 
+ sakila | staff         | staff_idx_fk_store_id                   | BTREE      | f          | 
+ sakila | store         | store_idx_fk_address_id                 | BTREE      | f          | 
+ sakila | store         | store_idx_unique_manager                | BTREE      | t          | 
 (26 rows)
 
 SELECT * FROM fdw_stage.triggers ORDER BY schema, table_name, trigger_name;

@@ -1,5 +1,5 @@
 comment = 'Tools to migrate MySQL/MariaDB databases to PostgreSQL'
-default_version = '0.2.0'
+default_version = '0.3.0'
 requires = 'mysql_fdw, db_migrator'
 superuser = false
 relocatable = true

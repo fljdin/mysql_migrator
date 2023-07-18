@@ -295,7 +295,7 @@ DECLARE
       CREATE OR REPLACE VIEW %1$I.indexes AS
          SELECT DISTINCT "TABLE_SCHEMA" AS schema, "TABLE_NAME" AS table_name,
             concat_ws('_', "TABLE_NAME", "INDEX_NAME")::character varying(64) AS index_name, 
-            "INDEX_TYPE" AS index_type, ("NON_UNIQUE" = 0) AS uniqueness
+            "INDEX_TYPE" AS index_type, ("NON_UNIQUE" = 0) AS uniqueness, null::text AS where_clause
          FROM %1$I."STATISTICS"
          WHERE "TABLE_SCHEMA" NOT IN (%2$s)
          AND "INDEX_NAME" <> 'PRIMARY' AND "IS_VISIBLE"::boolean; -- prior to MySQL v8
