@@ -40,14 +40,6 @@ SELECT db_migrate_tables(
                  0
 (1 row)
 
-SELECT db_migrate_constraints(
-   plugin => 'mysql_migrator'
-);
- db_migrate_constraints 
-------------------------
-                      0
-(1 row)
-
 SELECT db_migrate_functions(
    plugin => 'mysql_migrator'
 );
@@ -70,6 +62,22 @@ SELECT db_migrate_views(
  db_migrate_views 
 ------------------
                 0
+(1 row)
+
+SELECT db_migrate_indexes(
+   plugin => 'mysql_migrator'
+);
+ db_migrate_indexes 
+--------------------
+                  0
+(1 row)
+
+SELECT db_migrate_constraints(
+   plugin => 'mysql_migrator'
+);
+ db_migrate_constraints 
+------------------------
+                      0
 (1 row)
 
 /* attach sequences to table columns as identity */

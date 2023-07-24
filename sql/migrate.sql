@@ -32,10 +32,6 @@ SELECT db_migrate_tables(
    plugin => 'mysql_migrator'
 );
 
-SELECT db_migrate_constraints(
-   plugin => 'mysql_migrator'
-);
-
 SELECT db_migrate_functions(
    plugin => 'mysql_migrator'
 );
@@ -45,6 +41,14 @@ SELECT db_migrate_triggers(
 );
 
 SELECT db_migrate_views(
+   plugin => 'mysql_migrator'
+);
+
+SELECT db_migrate_indexes(
+   plugin => 'mysql_migrator'
+);
+
+SELECT db_migrate_constraints(
    plugin => 'mysql_migrator'
 );
 
